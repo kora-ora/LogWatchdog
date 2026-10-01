@@ -1,0 +1,19 @@
+2026-09-30T10:00:01Z [INFO] [Workflow: ci-build] Job started: Run #101
+2026-09-30T10:00:03Z [INFO] [Step: Checkout] Git checkout main branch sha: a1b2c3d
+2026-09-30T10:00:05Z [INFO] [Step: Setup] Setting up Python 3.11 environment
+2026-09-30T10:00:10Z [INFO] [Step: Install] Running pip install -r requirements.txt
+2026-09-30T10:00:25Z [INFO] [Step: Test] Executing pytest tests/
+2026-09-30T10:00:30Z [INFO] [Step: Test] 45 passed, 0 failed in 4.12s
+2026-09-30T10:00:32Z [INFO] [Step: Build] Building Docker image myapp:v1.0.1
+2026-09-30T10:00:45Z [INFO] [Step: Deploy] Pushing image to registry.internal.net
+2026-09-30T10:00:50Z [INFO] [Workflow: ci-build] Job completed successfully status: SUCCESS
+2026-09-30T10:05:01Z [INFO] [Workflow: ci-build] Job started: Run #102
+2026-09-30T10:05:03Z [INFO] [Step: Checkout] Git checkout feature/auth branch sha: d4e5f6a
+2026-09-30T10:05:05Z [INFO] [Step: Setup] Setting up Python 3.11 environment
+2026-09-30T10:05:10Z [INFO] [Step: Install] Running pip install -r requirements.txt
+2026-09-30T10:05:40Z [WARN] [Step: Install] Connection timed out while downloading package 'torch-2.0'
+2026-09-30T10:05:41Z [INFO] [Step: Install] Retrying download attempt 1 of 3
+2026-09-30T10:06:11Z [WARN] [Step: Install] Connection timed out while downloading package 'torch-2.0'
+2026-09-30T10:06:12Z [INFO] [Step: Install] Retrying download attempt 2 of 3
+2026-09-30T10:06:42Z [ERROR] [Step: Install] Max retries exceeded: Failed to establish a new connection
+2026-09-30T10:06:43Z [ERROR] [Workflow: ci-build] Process completed with exit code 1 status: FAILED

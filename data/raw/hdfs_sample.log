@@ -1,0 +1,22 @@
+081109 203615 148 INFO dfs.DataNode$DataXceiver: Receiving block blk_-1608999687919862906 src: /10.250.19.102:54106 dest: /10.250.19.102:50010
+081109 203620 23 INFO dfs.FSNamesystem: BLOCK* NameSystem.allocateBlock: /mnt/hadoop/mapred/system/job_200811092030_0001/job.jar. blk_-1608999687919862906
+081109 203622 148 INFO dfs.DataNode$PacketResponder: PacketResponder blk_-1608999687919862906 1 received
+081109 203624 148 INFO dfs.DataNode$PacketResponder: PacketResponder blk_-1608999687919862906 2 terminating
+081109 203625 13 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.19.102:50010 is added to blk_-1608999687919862906 size 91178
+081109 203630 148 INFO dfs.DataNode$DataXceiver: 10.250.19.102:50010 Served block blk_-1608999687919862906 to /10.250.19.102:54106
+081109 203701 145 INFO dfs.DataNode$DataXceiver: Receiving block blk_750348333428938754 src: /10.250.10.6:41121 dest: /10.250.10.6:50010
+081109 203703 145 INFO dfs.DataNode$PacketResponder: PacketResponder blk_750348333428938754 1 received
+081109 203705 145 INFO dfs.DataNode$PacketResponder: PacketResponder blk_750348333428938754 2 terminating
+081109 203706 14 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.10.6:50010 is added to blk_750348333428938754 size 67108864
+081109 203710 145 INFO dfs.DataNode$DataXceiver: 10.250.10.6:50010 Served block blk_750348333428938754 to /10.250.10.6:41121
+081109 203801 150 INFO dfs.DataNode$DataXceiver: Receiving block blk_3587508140051195832 src: /10.250.14.224:39102 dest: /10.250.14.224:50010
+081109 203803 150 INFO dfs.DataNode$PacketResponder: PacketResponder blk_3587508140051195832 1 received
+081109 203804 150 INFO dfs.DataNode$PacketResponder: PacketResponder blk_3587508140051195832 2 terminating
+081109 203806 15 INFO dfs.FSNamesystem: BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.14.224:50010 is added to blk_3587508140051195832 size 67108864
+081109 203912 152 INFO dfs.DataNode$DataXceiver: Receiving block blk_-354458330528986947 src: /10.250.11.100:48210 dest: /10.250.11.100:50010
+081109 203915 152 WARN dfs.DataNode$DataXceiver: 10.250.11.100:50010:Got exception while serving blk_-354458330528986947 to /10.250.11.100:48210: java.io.IOException: Connection reset by peer
+081109 203916 152 INFO dfs.DataNode$DataXceiver: 10.250.11.100:50010:Retrying to serve block blk_-354458330528986947
+081109 203917 152 ERROR dfs.DataNode$DataXceiver: 10.250.11.100:50010:Failed to serve block blk_-354458330528986947 after retry timeout
+081109 204000 160 INFO dfs.DataNode$DataXceiver: Receiving block blk_999999999999999999 src: /10.250.19.102:54106 dest: /10.250.19.102:50010
+081109 204001 160 ERROR dfs.DataNode$DataXceiver: Unexpected error trying to delete block blk_999999999999999999. BlockInfo not found in volumeMap.
+081109 204002 160 WARN dfs.DataNode$DataXceiver: Verification failed for blk_999999999999999999 checksum mismatch

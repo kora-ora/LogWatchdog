@@ -1,0 +1,236 @@
+{
+  "main": {
+    "id": "db5e5fc72a26f84d",
+    "type": "split",
+    "children": [
+      {
+        "id": "961d029d459af30a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "eb7f3113f351aec2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "PROJECT_ROADMAP.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "PROJECT_ROADMAP"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "bf9923ae9da6e5c7",
+    "type": "split",
+    "children": [
+      {
+        "id": "0fb9b530edc91c60",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "dc5ec939577c08a3",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "0a21dc0257663697",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "9370440f29bfff98",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "96848b120caf0ea3",
+    "type": "split",
+    "children": [
+      {
+        "id": "6082fef1cf19ef49",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7012aa68364f533a",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "PROJECT_ROADMAP.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "cd0bd0aff59e5fe1",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "PROJECT_ROADMAP.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "117376a2b374a20f",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "e08a9deb63123558",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "484a5278de092142",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "PROJECT_ROADMAP.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "eb7f3113f351aec2",
+  "lastOpenFiles": [
+    "venv/lib/python3.14/site-packages/__pycache__/pylab.cpython-314.pyc",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/WHEEL",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/REQUESTED",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/RECORD",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/METADATA",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/LICENSE",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info/INSTALLER",
+    "venv/lib/python3.14/site-packages/matplotlib-3.11.2.dist-info",
+    "venv/lib/python3.14/site-packages/mpl_toolkits/axisartist/tests/__pycache__/test_grid_helper_curvelinear.cpython-314.pyc",
+    "venv/lib/python3.14/site-packages/mpl_toolkits/axisartist/tests/__pycache__/test_grid_finder.cpython-314.pyc",
+    "venv/lib/python3.14/site-packages/mpl_toolkits/axisartist/tests/__pycache__/test_floating_axes.cpython-314.pyc",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/zoom_to_rect_large.png",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/zoom_to_rect.svg",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/zoom_to_rect.png",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/zoom_to_rect-symbolic.svg",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/subplots_large.png",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/subplots.svg",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/subplots.png",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/subplots-symbolic.svg",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/qt4_editor_options_large.png",
+    "venv/lib/python3.14/site-packages/matplotlib/mpl-data/images/qt4_editor_options.svg",
+    "venv/lib/python3.14/site-packages/sklearn/externals/array_api_extra/README.md",
+    "venv/lib/python3.14/site-packages/sklearn/externals/array_api_compat/README.md",
+    "venv/lib/python3.14/site-packages/scipy/fft/_duccfft/LICENSE.md",
+    "venv/lib/python3.14/site-packages/narwhals-2.26.0.dist-info/licenses/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/sfc64/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/splitmix64/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/philox/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/pcg64/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/mt19937/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/LICENSE.md",
+    "venv/lib/python3.14/site-packages/numpy/random/LICENSE.md",
+    "venv/lib/python3.14/site-packages/pyparsing/ai/best_practices.md",
+    "venv/lib/python3.14/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md",
+    "venv/lib/python3.14/site-packages/pip/_vendor/idna/LICENSE.md",
+    "README.md",
+    "SYSTEM_ARCHITECTURE.md",
+    "PROJECT_ROADMAP.md",
+    "TRANSFORMER_ARCHITECTURE.md"
+  ]
+}
