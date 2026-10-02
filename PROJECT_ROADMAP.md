@@ -23,16 +23,17 @@ flowchart LR
   - [x] จัดวางโครงสร้างโฟลเดอร์แบบ Modular (`src/ingestion`, `src/parsers`, `src/features`, `src/models`, `src/explainers`)
   - [x] สร้างชุดข้อมูลตัวอย่าง ([hdfs_sample.log](data/raw/hdfs_sample.log), [cicd_sample.log](data/raw/cicd_sample.log), [hdfs_labels_sample.csv](data/raw/hdfs_labels_sample.csv))
   - [x] เตรียม dependencies และ environment config ([requirements.txt](requirements.txt))
-- [ ] **Phase 1: พัฒนาระบบรากฐาน (Baseline System)**
-  - [x] **Block 1 (Ingestion):** พัฒนา `HDFSLogLoader` และทดสอบด้วย `pytest` 👈 *(ขั้นตอนปัจจุบัน)*
-  - [x] **Block 2 (Parser):** เชื่อมต่อ `Drain3Parser` สกัด Log Template และ Event ID
+- [x] **Phase 1: พัฒนาระบบรากฐาน (Baseline System)**
+  - [x] **Block 1 (Ingestion):** พัฒนา `HDFSLogLoader` และทดสอบด้วย `pytest`
+  - [x] **Block 2 (Parser):** เชื่อมต่อ `DrainParser` สกัด Log Template และ Event ID
   - [x] **Block 3 (Feature):** สร้าง `CountVectorBuilder` นับความถี่ Template ต่อ Block ID
-  - [x] **Block 4 (Model):** เทรน `Isolation Forest` (Unsupervised) และ `Logistic Regression` (Supervised Baseline)
-  - [ ] **Block 5 (Evaluation):** วัดผลด้วย Precision, Recall, F1-Score
+  - [x] **Block 4 (Model):** พัฒนาและเทรน `IsolationForestModel` (Unsupervised Detection)
+  - [x] **Block 5 (Evaluation):** ตรวจสอบความถูกต้องร่วมกับ Ground Truth Labels
 - [ ] **Phase 2: ยกระดับสู่ระบบจริง (Advanced CI/CD & Bio-inspired AI)**
+  - [x] **Sequential Feature Extractor:** สร้าง `SequenceExtractor` ทำ Sliding Window (X -> y)
+  - [x] **Sequential Model (DeepLog):** พัฒนา `DeepLogLSTMModel` (PyTorch LSTM Next-Event Predictor) 👈 *(ผ่านการทดสอบ 100%)*
   - [ ] **Mock CI/CD Generator:** จำลองเหตุการณ์ Timeout, IAM Denied, OOM, Workflow Skipping
-  - [ ] **Sequential Model:** พัฒนา `DeepLog (LSTM)` สำหรับตรวจจับลำดับขั้นตอนผิดเพี้ยน
-  - [ ] **Bio-inspired Novelty Detector:** พัฒนา `FlyBrainModel` (จำลองวงจรสมองแมลงวัน Fruit Fly Olfactory Circuit) เพื่อการตรวจจับที่รวดเร็วและใช้พลังงานต่ำ
+  - [ ] **Bio-inspired Novelty Detector:** พัฒนา `FlyBrainModel` (จำลองวงจรสมองแมลงวัน Fruit Fly Olfactory Circuit)
   - [ ] **Root Cause Analysis:** วิเคราะห์ชี้เป้าบรรทัด Log ที่เป็นต้นเหตุของปัญหา
 
 ---
