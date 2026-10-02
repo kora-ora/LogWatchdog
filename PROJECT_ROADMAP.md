@@ -26,8 +26,8 @@ flowchart LR
 - [ ] **Phase 1: พัฒนาระบบรากฐาน (Baseline System)**
   - [x] **Block 1 (Ingestion):** พัฒนา `HDFSLogLoader` และทดสอบด้วย `pytest` 👈 *(ขั้นตอนปัจจุบัน)*
   - [x] **Block 2 (Parser):** เชื่อมต่อ `Drain3Parser` สกัด Log Template และ Event ID
-  - [ ] **Block 3 (Feature):** สร้าง `CountVectorBuilder` นับความถี่ Template ต่อ Block ID
-  - [ ] **Block 4 (Model):** เทรน `Isolation Forest` (Unsupervised) และ `Logistic Regression` (Supervised Baseline)
+  - [x] **Block 3 (Feature):** สร้าง `CountVectorBuilder` นับความถี่ Template ต่อ Block ID
+  - [x] **Block 4 (Model):** เทรน `Isolation Forest` (Unsupervised) และ `Logistic Regression` (Supervised Baseline)
   - [ ] **Block 5 (Evaluation):** วัดผลด้วย Precision, Recall, F1-Score
 - [ ] **Phase 2: ยกระดับสู่ระบบจริง (Advanced CI/CD & Bio-inspired AI)**
   - [ ] **Mock CI/CD Generator:** จำลองเหตุการณ์ Timeout, IAM Denied, OOM, Workflow Skipping
