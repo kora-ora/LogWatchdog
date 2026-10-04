@@ -7,7 +7,7 @@
 ## สารบัญเอกสารสำคัญ
 - 📖 [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) - **คู่มือและแผนงานพัฒนา:** อธิบายแนวคิดพื้นฐาน, สถานะความคืบหน้าของแต่ละบล็อก และวิธีติดตั้งสภาพแวดล้อม
 - 📐 [SYSTEM_ARCHITECTURE.md](SYSTEM_ARCHITECTURE.md) - **ผังสถาปัตยกรรมระบบ:** แผนผังการทำงาน End-to-End และสถาปัตยกรรมตัวต่อเลโก้ (Lego Modular Architecture) สำหรับเปิดดูใน Obsidian
-- 📚 [RESEARCH_REFERENCES.md](RESEARCH_REFERENCES.md) - **เอกสารอ้างอิงงานวิจัย:** แหล่งที่มาของงานวิจัยวิชาการและเหตุผลเชิงเทคนิคที่นำมาใช้ในโปรเจกต์
+- 📚 [RESEARCH_AND_DATASET_REFERENCES.md](RESEARCH_AND_DATASET_REFERENCES.md) - **เอกสารอ้างอิงงานวิจัยและชุดข้อมูล:** แหล่งที่มาของงานวิจัยวิชาการและชุดข้อมูล (HDFS & CI/CD) ที่ใช้ฝึกสอนและทดสอบโมเดล
 
 ---
 

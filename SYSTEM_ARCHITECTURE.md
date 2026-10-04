@@ -25,6 +25,10 @@ flowchart TD
         T5["05. LSTM Execution Flow<br/>(ผังการทำงานลึกระดับเซลล์ประสาท)"]
         T6["06. LSTM Network Internals<br/>(สถาปัตยกรรมนิวรอน, 4 ประตู & 2 Layers)"]
     end
+
+    subgraph Evaluation & Integrity
+        T7["07. Evaluation & Zero-Leakage Audit<br/>(ระเบียบวิธีทดสอบ & ป้องกัน Data Leak)"]
+    end
     
     Hub --> T1
     Hub --> T2
@@ -32,12 +36,14 @@ flowchart TD
     Hub --> T4
     Hub --> T5
     Hub --> T6
+    Hub --> T7
 
     T1 -.-> T2
     T2 -.-> T3
     T3 -.-> T4
     T4 -.-> T5
     T5 -.-> T6
+    T6 -.-> T7
 ```
 
 ---
@@ -99,8 +105,19 @@ flowchart TD
 
 ---
 
+### 7. [07. ระเบียบวิธีทดสอบและการป้องกัน Data Leakage (Evaluation Methodology & Zero-Leakage Audit)](system_architecture/07_evaluation_methodology_and_data_leakage_audit.md)
+- **ไฟล์:** `system_architecture/07_evaluation_methodology_and_data_leakage_audit.md` (หรือ `[[07_evaluation_methodology_and_data_leakage_audit]]`)
+- **เนื้อหาหลัก:**
+  - ยุทธศาสตร์การแบ่ง Train/Test แบบ **Session-Level Disjoint Split** ป้องกัน Sliding Window Leakage
+  - ผลการผ่าตัดตรวจ Data Leakage ในระดับ Preprocessing, Template Mining และโมเดล LSTM
+  - การทำ **Strict Inductive Drain3 Parsing (Read-Only Test Inference)**
+  - มาตรวัดความถูกต้องทางคณิตศาสตร์ (TP, FP, TN, FN, Precision, Recall, Specificity, F1-Score)
+  - ข้อจำกัดทางสถิติด้านขนาดกลุ่มตัวอย่าง (Sample Size Variance) และแนวทางขยายผลสู่ Production
+
+---
+
 ## 🔗 เอกสารที่เกี่ยวข้องใน Obsidian Vault
 
 - 📖 [[README]]: ข้อมูลภาพรวมโครงการและสารบัญหลัก
 - 🗺️ [[PROJECT_ROADMAP]]: แผนงานและสถานะความคืบหน้ารายเฟส (Block 1 - Block 5)
-- 📚 [[RESEARCH_REFERENCES]]: เอกสารอ้างอิงงานวิจัยวิชาการและเหตุผลเชิงเทคนิค (DeepLog, Drain, Isolation Forest, Fly Novelty Detection, LogHub)
+- 📚 [[RESEARCH_AND_DATASET_REFERENCES]]: เอกสารอ้างอิงงานวิจัยวิชาการและชุดข้อมูล (DeepLog, Drain, Isolation Forest, Fly Novelty Detection, LogHub, CI/CD Benchmark)

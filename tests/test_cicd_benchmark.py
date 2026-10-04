@@ -50,64 +50,69 @@ def test_end_to_end_cicd_benchmark_deeplog():
     log_path = "data/raw/cicd_benchmark.log"
     label_path = "data/raw/cicd_benchmark_labels.csv"
 
-    # 1. Ingestion
     loader = CICDLogLoader(log_path)
-    parser = DrainParser()
-    extractor = SequenceExtractor(window_size=3)
+    all_lines = list(loader.load())
 
-    events = []
-    for line in loader.load():
+    # 1. Strict Session-Level Split (70% Normal Train, 30% Normal Test + All Anomaly Test)
+    train_run_ids = set([f"Run_{i}" for i in range(101, 108)])
+    test_run_ids = [f"Run_{i}" for i in range(108, 116)]
+
+    train_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in train_run_ids]
+    test_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in set(test_run_ids)]
+
+    # 2. Strict Train Fitting: Parser และ Feature Extractor เรียนรู้เฉพาะจาก Train Set เท่านั้น
+    parser = DrainParser()
+    train_events = []
+    for line in train_lines:
         run_id = CICDLogLoader.extract_run_id(line)
         clean_msg = CICDLogLoader.extract_message(line)
-        parsed = parser.parse_line(clean_msg)
-        events.append({
+        parsed = parser.parse_line(clean_msg, update_model=True)
+        train_events.append({
             "session_id": run_id,
             "template_id": parsed["template_id"],
             "line": line
         })
 
-    # 2. Extract sequences
-    seq_data = extractor.fit_transform(events)
-    session_sequences = seq_data["session_sequences"]
-    vocab_size = seq_data["vocab_size"]
+    extractor = SequenceExtractor(window_size=3)
+    train_seq_data = extractor.fit_transform(train_events)
+    train_vocab_size = train_seq_data["vocab_size"]
+    UNKNOWN_TOKEN = train_vocab_size  # Token สำหรับ Event แปลกปลอมที่ไม่เคยเจอใน Train Set
 
-    # 3. แยกชุดฝึกสอนเฉพาะรอบปกติ (Run_101 ถึง Run_110)
-    normal_run_ids = [f"Run_{i}" for i in range(101, 111)]
-    normal_events = [e for e in events if e["session_id"] in normal_run_ids]
-    normal_seq_data = extractor.fit_transform(normal_events)
+    # 3. Read-Only Inference บน Test Set: ห้ามอัปเดต Parser ป้องกัน Data Leakage 100%
+    test_session_sequences = {r_id: [] for r_id in test_run_ids}
+    for line in test_lines:
+        run_id = CICDLogLoader.extract_run_id(line)
+        clean_msg = CICDLogLoader.extract_message(line)
+        parsed = parser.parse_line(clean_msg, update_model=False)
+        tid = UNKNOWN_TOKEN if parsed["is_unseen"] else parsed["template_id"]
+        test_session_sequences[run_id].append(tid)
 
-    # 4. เทรน DeepLog ด้วย Normal Runs (ปรับ batch_size, epochs ตามขนาดข้อมูล)
+    # 4. เทรน DeepLog ด้วย Train Set และขนาด Vocab ที่มาจาก Train Set เท่านั้น
     model = DeepLogLSTMModel(
-        vocab_size=vocab_size + 2,
+        vocab_size=train_vocab_size + 2,
         window_size=3,
         hidden_dim=32,
         embedding_dim=32,
         num_layers=2,
-        epochs=30,
+        epochs=35,
         lr=0.02,
         top_k=2
     )
-    model.fit(normal_seq_data["X"], normal_seq_data["y"])
+    model.fit(train_seq_data["X"], train_seq_data["y"])
 
-    # 5. ทำนายทุก Session
-    predictions = {}
-    for r_id, seq in session_sequences.items():
-        pred = model.predict_session(seq)
-        predictions[r_id] = pred
-
-    # 6. อ่าน Ground Truth
+    # 5. ทำนายผลเฉพาะบน Test Set (Unseen Data)
     labels_df = pd.read_csv(label_path).set_index("RunId")
     y_true = []
     y_pred = []
 
-    for r_id in labels_df.index:
-        if r_id in predictions:
-            actual = 1 if labels_df.loc[r_id, "Label"] == "Anomaly" else 0
-            predicted = predictions[r_id]
-            y_true.append(actual)
-            y_pred.append(predicted)
+    for r_id in test_run_ids:
+        seq = test_session_sequences[r_id]
+        pred = model.predict_session(seq)
+        actual = 1 if labels_df.loc[r_id, "Label"] == "Anomaly" else 0
+        y_true.append(actual)
+        y_pred.append(pred)
 
-    # 7. คำนวณ Metrics
+    # 6. คำนวณ Metrics
     metrics = calculate_metrics(y_true, y_pred)
 
     # ตรวจสอบว่าโมเดลตรวจจับ Anomaly ได้จริง และ F1 >= 0.80
@@ -117,43 +122,60 @@ def test_end_to_end_cicd_benchmark_deeplog():
 
 if __name__ == "__main__":
     print("\n=======================================================")
-    print("🚀 เริ่มการทดสอบ CI/CD Benchmark & Evaluation Run")
+    print("🚀 เริ่มการทดสอบ CI/CD Benchmark & Evaluation Run (Strict Zero-Leakage)")
     print("=======================================================\n")
 
     log_path = "data/raw/cicd_benchmark.log"
     label_path = "data/raw/cicd_benchmark_labels.csv"
 
     loader = CICDLogLoader(log_path)
-    parser = DrainParser()
-    extractor = SequenceExtractor(window_size=3)
+    all_lines = list(loader.load())
 
-    events = []
-    for line in loader.load():
+    # 1. กำหนด Train/Test Set ที่ระดับ Session (Run ID)
+    train_run_ids = set([f"Run_{i}" for i in range(101, 108)])  # 70% Normal
+    test_run_ids = [f"Run_{i}" for i in range(108, 116)]         # 30% Normal + All Anomaly
+
+    train_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in train_run_ids]
+    test_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in set(test_run_ids)]
+
+    print(f"📦 จำนวนบรรทัด Log ทั้งหมด: {len(all_lines)} บรรทัด (Train: {len(train_lines)}, Test: {len(test_lines)})")
+    print(f"🏋️ [Training Set]  ใช้สอนโมเดล (Normal Only): {len(train_run_ids)} runs ({sorted(list(train_run_ids))})")
+    print(f"🎯 [Test Set]      ข้อสอบ Unseen (Normal + Anomaly): {len(test_run_ids)} runs ({test_run_ids})\n")
+
+    # 2. Strict Train Fitting: Parser เรียนรู้เฉพาะ Training Data
+    parser = DrainParser()
+    train_events = []
+    for line in train_lines:
         run_id = CICDLogLoader.extract_run_id(line)
         clean_msg = CICDLogLoader.extract_message(line)
-        parsed = parser.parse_line(clean_msg)
-        events.append({
+        parsed = parser.parse_line(clean_msg, update_model=True)
+        train_events.append({
             "session_id": run_id,
             "template_id": parsed["template_id"],
             "line": line
         })
 
-    seq_data = extractor.fit_transform(events)
-    session_sequences = seq_data["session_sequences"]
-    vocab_size = seq_data["vocab_size"]
+    extractor = SequenceExtractor(window_size=3)
+    train_seq_data = extractor.fit_transform(train_events)
+    train_vocab_size = train_seq_data["vocab_size"]
+    UNKNOWN_TOKEN = train_vocab_size
 
-    print(f"📦 จำนวนบรรทัด Log ทั้งหมด: {len(events)} บรรทัด")
-    print(f"🧩 ค้นพบ Log Template (Vocabulary Size): {vocab_size} templates")
-    print(f"🔄 จำนวน CI/CD Runs: {len(session_sequences)} runs\n")
+    print(f"🧩 ค้นพบ Log Template ใน Training Set เท่านั้น: {train_vocab_size} templates")
+    print("🔒 โหมดป้องกัน Data Leakage: Drain3 จะไม่เรียนรู้หรือสร้าง Template จาก Test Set เด็ดขาด!\n")
 
-    # เทรนด้วย Normal Runs
-    normal_run_ids = [f"Run_{i}" for i in range(101, 111)]
-    normal_events = [e for e in events if e["session_id"] in normal_run_ids]
-    normal_seq_data = extractor.fit_transform(normal_events)
+    # 3. Read-Only Inference บน Test Set
+    test_session_sequences = {r_id: [] for r_id in test_run_ids}
+    for line in test_lines:
+        run_id = CICDLogLoader.extract_run_id(line)
+        clean_msg = CICDLogLoader.extract_message(line)
+        parsed = parser.parse_line(clean_msg, update_model=False)
+        tid = UNKNOWN_TOKEN if parsed["is_unseen"] else parsed["template_id"]
+        test_session_sequences[run_id].append(tid)
 
-    print("🧠 กำลังฝึกสอนโมเดล DeepLog LSTM บน Normal Runs (Run 101 - 110)...")
+    # 4. สร้างและเทรนโมเดล DeepLog LSTM
+    print("🧠 กำลังฝึกสอนโมเดล DeepLog LSTM บน Training Set เท่านั้น...")
     model = DeepLogLSTMModel(
-        vocab_size=vocab_size + 2,
+        vocab_size=train_vocab_size + 2,
         window_size=3,
         hidden_dim=32,
         embedding_dim=32,
@@ -162,40 +184,40 @@ if __name__ == "__main__":
         lr=0.02,
         top_k=2
     )
-    model.fit(normal_seq_data["X"], normal_seq_data["y"])
+    model.fit(train_seq_data["X"], train_seq_data["y"])
     print("✅ การฝึกสอนเสร็จสิ้น!\n")
 
-    # ทดสอบทำนายผล
+    # 5. ทดสอบทำนายผลเฉพาะบน Test Set (Unseen Data)
     labels_df = pd.read_csv(label_path).set_index("RunId")
     y_true = []
     y_pred = []
     table_rows = []
 
-    for r_id in labels_df.index:
-        if r_id in session_sequences:
-            seq = session_sequences[r_id]
-            pred = model.predict_session(seq)
-            actual_label = labels_df.loc[r_id, "Label"]
-            actual = 1 if actual_label == "Anomaly" else 0
+    for r_id in test_run_ids:
+        seq = test_session_sequences[r_id]
+        pred = model.predict_session(seq)
+        actual_label = labels_df.loc[r_id, "Label"]
+        actual = 1 if actual_label == "Anomaly" else 0
 
-            y_true.append(actual)
-            y_pred.append(pred)
+        y_true.append(actual)
+        y_pred.append(pred)
 
-            status = "✅ ถูกต้อง" if actual == pred else "❌ พลาด"
-            table_rows.append({
-                "Run ID": r_id,
-                "Ground Truth": actual_label,
-                "Prediction": "🚨 Anomaly" if pred == 1 else "✅ Normal",
-                "Status": status
-            })
+        status = "✅ ถูกต้อง" if actual == pred else "❌ พลาด"
+        table_rows.append({
+            "Run ID": r_id,
+            "Set Type": "Unseen Normal" if actual == 0 else "Anomaly Case",
+            "Ground Truth": actual_label,
+            "Prediction": "🚨 Anomaly" if pred == 1 else "✅ Normal",
+            "Status": status
+        })
 
     # แสดงตารางผลลัพธ์
     df_result = pd.DataFrame(table_rows).set_index("Run ID")
-    print("📋 ตารางเปรียบเทียบผลการทำนายรายรอบ (Run Comparison Table):")
+    print("📋 ตารางผลการทดสอบบนข้อสอบที่ไม่เคยเห็นมาก่อน (Zero-Leakage Unseen Test Set):")
     print(df_result.to_string())
     print()
 
     # คำนวณและแสดง Evaluation Report
     metrics = calculate_metrics(y_true, y_pred)
-    report_text = format_classification_report(metrics, model_name="DeepLog 2-Layer LSTM")
+    report_text = format_classification_report(metrics, model_name="Zero-Leakage DeepLog 2-Layer LSTM")
     print(report_text)
