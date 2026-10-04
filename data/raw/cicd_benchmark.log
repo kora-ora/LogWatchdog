@@ -1,0 +1,174 @@
+# === CI/CD Benchmark Logs (GitHub Actions Format) ===
+
+# --- Run #101: Standard Build & Deploy (Normal) ---
+2026-10-04T10:00:01Z [INFO] [Run: Run_101] [Workflow: ci-pipeline] Job started: Run #101
+2026-10-04T10:00:02Z [INFO] [Run: Run_101] [Step: Checkout] Git checkout main branch sha: 9a7b1c3
+2026-10-04T10:00:05Z [INFO] [Run: Run_101] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:00:10Z [INFO] [Run: Run_101] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:00:20Z [INFO] [Run: Run_101] [Step: Test] Executing pytest tests/
+2026-10-04T10:00:25Z [INFO] [Run: Run_101] [Step: Test] 19 passed in 3.42s
+2026-10-04T10:00:27Z [INFO] [Run: Run_101] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:00:30Z [INFO] [Run: Run_101] [Step: Build] Building Docker image myapp:101
+2026-10-04T10:00:45Z [INFO] [Run: Run_101] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:00:50Z [INFO] [Run: Run_101] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #102: Standard Build & Deploy (Normal) ---
+2026-10-04T10:10:01Z [INFO] [Run: Run_102] [Workflow: ci-pipeline] Job started: Run #102
+2026-10-04T10:10:02Z [INFO] [Run: Run_102] [Step: Checkout] Git checkout main branch sha: 1f8e2d4
+2026-10-04T10:10:05Z [INFO] [Run: Run_102] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:10:10Z [INFO] [Run: Run_102] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:10:20Z [INFO] [Run: Run_102] [Step: Test] Executing pytest tests/
+2026-10-04T10:10:25Z [INFO] [Run: Run_102] [Step: Test] 19 passed in 3.18s
+2026-10-04T10:10:27Z [INFO] [Run: Run_102] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:10:30Z [INFO] [Run: Run_102] [Step: Build] Building Docker image myapp:102
+2026-10-04T10:10:45Z [INFO] [Run: Run_102] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:10:50Z [INFO] [Run: Run_102] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #103: Feature Branch Build (Normal) ---
+2026-10-04T10:20:01Z [INFO] [Run: Run_103] [Workflow: ci-pipeline] Job started: Run #103
+2026-10-04T10:20:02Z [INFO] [Run: Run_103] [Step: Checkout] Git checkout feat/oauth branch sha: 3c5a7e9
+2026-10-04T10:20:05Z [INFO] [Run: Run_103] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:20:10Z [INFO] [Run: Run_103] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:20:20Z [INFO] [Run: Run_103] [Step: Test] Executing pytest tests/
+2026-10-04T10:20:25Z [INFO] [Run: Run_103] [Step: Test] 19 passed in 3.55s
+2026-10-04T10:20:27Z [INFO] [Run: Run_103] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:20:30Z [INFO] [Run: Run_103] [Step: Build] Building Docker image myapp:103
+2026-10-04T10:20:45Z [INFO] [Run: Run_103] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:20:50Z [INFO] [Run: Run_103] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #104: Bugfix Branch Build (Normal) ---
+2026-10-04T10:30:01Z [INFO] [Run: Run_104] [Workflow: ci-pipeline] Job started: Run #104
+2026-10-04T10:30:02Z [INFO] [Run: Run_104] [Step: Checkout] Git checkout fix/login branch sha: 8b2d4f6
+2026-10-04T10:30:05Z [INFO] [Run: Run_104] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:30:10Z [INFO] [Run: Run_104] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:30:20Z [INFO] [Run: Run_104] [Step: Test] Executing pytest tests/
+2026-10-04T10:30:25Z [INFO] [Run: Run_104] [Step: Test] 19 passed in 2.99s
+2026-10-04T10:30:27Z [INFO] [Run: Run_104] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:30:30Z [INFO] [Run: Run_104] [Step: Build] Building Docker image myapp:104
+2026-10-04T10:30:45Z [INFO] [Run: Run_104] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:30:50Z [INFO] [Run: Run_104] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #105: Release Tag Build (Normal) ---
+2026-10-04T10:40:01Z [INFO] [Run: Run_105] [Workflow: ci-pipeline] Job started: Run #105
+2026-10-04T10:40:02Z [INFO] [Run: Run_105] [Step: Checkout] Git checkout tags/v1.1.0 sha: 7e9a1b3
+2026-10-04T10:40:05Z [INFO] [Run: Run_105] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:40:10Z [INFO] [Run: Run_105] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:40:20Z [INFO] [Run: Run_105] [Step: Test] Executing pytest tests/
+2026-10-04T10:40:25Z [INFO] [Run: Run_105] [Step: Test] 19 passed in 3.12s
+2026-10-04T10:40:27Z [INFO] [Run: Run_105] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:40:30Z [INFO] [Run: Run_105] [Step: Build] Building Docker image myapp:105
+2026-10-04T10:40:45Z [INFO] [Run: Run_105] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:40:50Z [INFO] [Run: Run_105] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #106: Hotfix Branch Build (Normal) ---
+2026-10-04T10:50:01Z [INFO] [Run: Run_106] [Workflow: ci-pipeline] Job started: Run #106
+2026-10-04T10:50:02Z [INFO] [Run: Run_106] [Step: Checkout] Git checkout hotfix/cache branch sha: 4a6c8e0
+2026-10-04T10:50:05Z [INFO] [Run: Run_106] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T10:50:10Z [INFO] [Run: Run_106] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T10:50:20Z [INFO] [Run: Run_106] [Step: Test] Executing pytest tests/
+2026-10-04T10:50:25Z [INFO] [Run: Run_106] [Step: Test] 19 passed in 3.05s
+2026-10-04T10:50:27Z [INFO] [Run: Run_106] [Step: Lint] Running flake8 and black linter check
+2026-10-04T10:50:30Z [INFO] [Run: Run_106] [Step: Build] Building Docker image myapp:106
+2026-10-04T10:50:45Z [INFO] [Run: Run_106] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T10:50:50Z [INFO] [Run: Run_106] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #107: Nightly Integration Build (Normal) ---
+2026-10-04T11:00:01Z [INFO] [Run: Run_107] [Workflow: ci-pipeline] Job started: Run #107
+2026-10-04T11:00:02Z [INFO] [Run: Run_107] [Step: Checkout] Git checkout develop branch sha: 5d7f9a1
+2026-10-04T11:00:05Z [INFO] [Run: Run_107] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:00:10Z [INFO] [Run: Run_107] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:00:20Z [INFO] [Run: Run_107] [Step: Test] Executing pytest tests/
+2026-10-04T11:00:25Z [INFO] [Run: Run_107] [Step: Test] 19 passed in 3.40s
+2026-10-04T11:00:27Z [INFO] [Run: Run_107] [Step: Lint] Running flake8 and black linter check
+2026-10-04T11:00:30Z [INFO] [Run: Run_107] [Step: Build] Building Docker image myapp:107
+2026-10-04T11:00:45Z [INFO] [Run: Run_107] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T11:00:50Z [INFO] [Run: Run_107] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #108: Chore Dependencies Update (Normal) ---
+2026-10-04T11:10:01Z [INFO] [Run: Run_108] [Workflow: ci-pipeline] Job started: Run #108
+2026-10-04T11:10:02Z [INFO] [Run: Run_108] [Step: Checkout] Git checkout chore/deps branch sha: 2b4d6f8
+2026-10-04T11:10:05Z [INFO] [Run: Run_108] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:10:10Z [INFO] [Run: Run_108] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:10:20Z [INFO] [Run: Run_108] [Step: Test] Executing pytest tests/
+2026-10-04T11:10:25Z [INFO] [Run: Run_108] [Step: Test] 19 passed in 3.25s
+2026-10-04T11:10:27Z [INFO] [Run: Run_108] [Step: Lint] Running flake8 and black linter check
+2026-10-04T11:10:30Z [INFO] [Run: Run_108] [Step: Build] Building Docker image myapp:108
+2026-10-04T11:10:45Z [INFO] [Run: Run_108] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T11:10:50Z [INFO] [Run: Run_108] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #109: Staging Deploy (Normal) ---
+2026-10-04T11:20:01Z [INFO] [Run: Run_109] [Workflow: ci-pipeline] Job started: Run #109
+2026-10-04T11:20:02Z [INFO] [Run: Run_109] [Step: Checkout] Git checkout staging branch sha: 9c1e3a5
+2026-10-04T11:20:05Z [INFO] [Run: Run_109] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:20:10Z [INFO] [Run: Run_109] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:20:20Z [INFO] [Run: Run_109] [Step: Test] Executing pytest tests/
+2026-10-04T11:20:25Z [INFO] [Run: Run_109] [Step: Test] 19 passed in 3.10s
+2026-10-04T11:20:27Z [INFO] [Run: Run_109] [Step: Lint] Running flake8 and black linter check
+2026-10-04T11:20:30Z [INFO] [Run: Run_109] [Step: Build] Building Docker image myapp:109
+2026-10-04T11:20:45Z [INFO] [Run: Run_109] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T11:20:50Z [INFO] [Run: Run_109] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #110: Main Merge Build (Normal) ---
+2026-10-04T11:30:01Z [INFO] [Run: Run_110] [Workflow: ci-pipeline] Job started: Run #110
+2026-10-04T11:30:02Z [INFO] [Run: Run_110] [Step: Checkout] Git checkout main branch sha: 6a8c0e2
+2026-10-04T11:30:05Z [INFO] [Run: Run_110] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:30:10Z [INFO] [Run: Run_110] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:30:20Z [INFO] [Run: Run_110] [Step: Test] Executing pytest tests/
+2026-10-04T11:30:25Z [INFO] [Run: Run_110] [Step: Test] 19 passed in 3.33s
+2026-10-04T11:30:27Z [INFO] [Run: Run_110] [Step: Lint] Running flake8 and black linter check
+2026-10-04T11:30:30Z [INFO] [Run: Run_110] [Step: Build] Building Docker image myapp:110
+2026-10-04T11:30:45Z [INFO] [Run: Run_110] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T11:30:50Z [INFO] [Run: Run_110] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #111: Network Timeout Anomaly (Failed) ---
+2026-10-04T11:40:01Z [INFO] [Run: Run_111] [Workflow: ci-pipeline] Job started: Run #111
+2026-10-04T11:40:02Z [INFO] [Run: Run_111] [Step: Checkout] Git checkout feat/search branch sha: 7b9d1f3
+2026-10-04T11:40:05Z [INFO] [Run: Run_111] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:40:10Z [INFO] [Run: Run_111] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:40:40Z [WARN] [Run: Run_111] [Step: Install] Connection timed out while downloading package 'torch-2.0'
+2026-10-04T11:40:41Z [INFO] [Run: Run_111] [Step: Install] Retrying download attempt 1 of 3
+2026-10-04T11:41:11Z [WARN] [Run: Run_111] [Step: Install] Connection timed out while downloading package 'torch-2.0'
+2026-10-04T11:41:12Z [ERROR] [Run: Run_111] [Step: Install] Max retries exceeded: Failed to establish a new connection
+2026-10-04T11:41:13Z [ERROR] [Run: Run_111] [Workflow: ci-pipeline] Process completed with exit code 1 status: FAILED
+
+# --- Run #112: Unit Test Failure Anomaly (Failed) ---
+2026-10-04T11:50:01Z [INFO] [Run: Run_112] [Workflow: ci-pipeline] Job started: Run #112
+2026-10-04T11:50:02Z [INFO] [Run: Run_112] [Step: Checkout] Git checkout feat/payment branch sha: 8a0c2e4
+2026-10-04T11:50:05Z [INFO] [Run: Run_112] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T11:50:10Z [INFO] [Run: Run_112] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T11:50:20Z [INFO] [Run: Run_112] [Step: Test] Executing pytest tests/
+2026-10-04T11:50:23Z [ERROR] [Run: Run_112] [Step: Test] AssertionError: Expected status code 200 OK but received 500 Internal Server Error
+2026-10-04T11:50:24Z [ERROR] [Run: Run_112] [Step: Test] 1 failed, 18 passed in 2.85s
+2026-10-04T11:50:25Z [ERROR] [Run: Run_112] [Workflow: ci-pipeline] Process completed with exit code 1 status: FAILED
+
+# --- Run #113: Out-Of-Memory OOM Anomaly (Failed) ---
+2026-10-04T12:00:01Z [INFO] [Run: Run_113] [Workflow: ci-pipeline] Job started: Run #113
+2026-10-04T12:00:02Z [INFO] [Run: Run_113] [Step: Checkout] Git checkout main branch sha: 3e5a7b9
+2026-10-04T12:00:05Z [INFO] [Run: Run_113] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T12:00:10Z [INFO] [Run: Run_113] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T12:00:20Z [INFO] [Run: Run_113] [Step: Test] Executing pytest tests/
+2026-10-04T12:00:25Z [INFO] [Run: Run_113] [Step: Test] 19 passed in 3.10s
+2026-10-04T12:00:27Z [INFO] [Run: Run_113] [Step: Lint] Running flake8 and black linter check
+2026-10-04T12:00:30Z [INFO] [Run: Run_113] [Step: Build] Building Docker image myapp:113
+2026-10-04T12:00:40Z [ERROR] [Run: Run_113] [Step: Build] Container killed by OOM Out Of Memory killer
+2026-10-04T12:00:41Z [ERROR] [Run: Run_113] [Workflow: ci-pipeline] Process completed with exit code 137 status: FAILED
+
+# --- Run #114: Step Skipping / Sequential Mismatch Anomaly ---
+2026-10-04T12:10:01Z [INFO] [Run: Run_114] [Workflow: ci-pipeline] Job started: Run #114
+2026-10-04T12:10:02Z [INFO] [Run: Run_114] [Step: Checkout] Git checkout rogue/skip branch sha: 2d4f6a8
+2026-10-04T12:10:05Z [INFO] [Run: Run_114] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T12:10:10Z [INFO] [Run: Run_114] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T12:10:15Z [INFO] [Run: Run_114] [Workflow: ci-pipeline] Job completed successfully status: SUCCESS
+
+# --- Run #115: Cloud IAM Permission Denied Anomaly (Failed) ---
+2026-10-04T12:20:01Z [INFO] [Run: Run_115] [Workflow: ci-pipeline] Job started: Run #115
+2026-10-04T12:20:02Z [INFO] [Run: Run_115] [Step: Checkout] Git checkout main branch sha: 1a3c5e7
+2026-10-04T12:20:05Z [INFO] [Run: Run_115] [Step: Setup] Setting up Python 3.11 environment
+2026-10-04T12:20:10Z [INFO] [Run: Run_115] [Step: Install] Running pip install -r requirements.txt
+2026-10-04T12:20:20Z [INFO] [Run: Run_115] [Step: Test] Executing pytest tests/
+2026-10-04T12:20:25Z [INFO] [Run: Run_115] [Step: Test] 19 passed in 3.20s
+2026-10-04T12:20:27Z [INFO] [Run: Run_115] [Step: Lint] Running flake8 and black linter check
+2026-10-04T12:20:30Z [INFO] [Run: Run_115] [Step: Build] Building Docker image myapp:115
+2026-10-04T12:20:45Z [INFO] [Run: Run_115] [Step: Deploy] Pushing container image to cloud registry
+2026-10-04T12:20:46Z [ERROR] [Run: Run_115] [Step: Deploy] AccessDeniedException: User is not authorized to perform: PutImage on resource
+2026-10-04T12:20:47Z [ERROR] [Run: Run_115] [Workflow: ci-pipeline] Process completed with exit code 1 status: FAILED

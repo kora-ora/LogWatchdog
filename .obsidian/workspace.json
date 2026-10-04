@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "SYSTEM_ARCHITECTURE.md",
+                "file": "PROJECT_ROADMAP.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SYSTEM_ARCHITECTURE"
+              "title": "PROJECT_ROADMAP"
             }
           }
         ]
@@ -190,17 +190,27 @@
   },
   "active": "eb7f3113f351aec2",
   "lastOpenFiles": [
-    "venv/lib/python3.14/site-packages/torch/_inductor/__pycache__/test_operators.cpython-314-pytest-9.1.1.pyc",
-    "tests/__pycache__/test_deeplog.cpython-314-pytest-9.1.1.pyc",
-    "src/models/__pycache__/deeplog_lstm.cpython-314.pyc",
-    "tests/test_deeplog.py",
-    "src/models/deeplog_lstm.py",
-    "tests/__pycache__/test_sequence_extractor.cpython-314-pytest-9.1.1.pyc",
-    "src/features/__pycache__/sequence_extractor.cpython-314.pyc",
-    "tests/test_sequence_extractor.py",
-    "src/features/sequence_extractor.py",
-    "venv/bin/torchfrtrace",
-    "venv/bin/torchrun",
+    "README.md",
+    "SYSTEM_ARCHITECTURE.md",
+    "RESEARCH_REFERENCES.md",
+    "PROJECT_ROADMAP.md",
+    "tests/__pycache__/test_cicd_benchmark.cpython-314-pytest-9.1.1.pyc",
+    "src/evaluation/__pycache__/metrics.cpython-314.pyc",
+    "src/evaluation/__pycache__/__init__.cpython-314.pyc",
+    "src/evaluation/__pycache__",
+    "tests/test_cicd_benchmark.py",
+    "src/evaluation/metrics.py",
+    "src/evaluation/__init__.py",
+    "src/evaluation",
+    "data/raw/cicd_benchmark_labels.csv",
+    "data/raw/cicd_benchmark.log",
+    "system_architecture/06_lstm_neural_network_internals.md",
+    "system_architecture/04_sequential_sliding_window.md",
+    "system_architecture/03_count_vector_transformation.md",
+    "system_architecture/02_lego_modular_architecture.md",
+    "system_architecture/05_lstm_execution_flow.md",
+    "system_architecture/README.md",
+    "system_architecture/01_end_to_end_workflow.md",
     "venv/lib/python3.14/site-packages/networkx/drawing/tests/baseline/test_house_with_colors.png",
     "venv/lib/python3.14/site-packages/networkx/drawing/tests/baseline/test_display_shortest_path.png",
     "venv/lib/python3.14/site-packages/networkx/drawing/tests/baseline/test_display_labels_and_colors.png",
@@ -211,9 +221,6 @@
     "venv/lib/python3.14/site-packages/sympy/plotting/tests/test_region_or.png",
     "venv/lib/python3.14/site-packages/sympy/plotting/tests/test_region_not.png",
     "venv/lib/python3.14/site-packages/sympy/plotting/tests/test_region_and.png",
-    "PROJECT_ROADMAP.md",
-    "SYSTEM_ARCHITECTURE.md",
-    "README.md",
     "venv/lib/python3.14/site-packages/sklearn/externals/array_api_extra/README.md",
     "venv/lib/python3.14/site-packages/sklearn/externals/array_api_compat/README.md",
     "venv/lib/python3.14/site-packages/scipy/fft/_duccfft/LICENSE.md",
@@ -227,10 +234,6 @@
     "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/src/distributions/LICENSE.md",
     "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/fft/pocketfft/LICENSE.md",
     "venv/lib/python3.14/site-packages/numpy-2.5.3.dist-info/licenses/numpy/random/LICENSE.md",
-    "venv/lib/python3.14/site-packages/numpy/random/LICENSE.md",
-    "venv/lib/python3.14/site-packages/pyparsing/ai/best_practices.md",
-    "venv/lib/python3.14/site-packages/pip-26.0.1.dist-info/licenses/src/pip/_vendor/idna/LICENSE.md",
-    "venv/lib/python3.14/site-packages/pip/_vendor/idna/LICENSE.md",
-    "TRANSFORMER_ARCHITECTURE.md"
+    "venv/lib/python3.14/site-packages/numpy/random/LICENSE.md"
   ]
 }

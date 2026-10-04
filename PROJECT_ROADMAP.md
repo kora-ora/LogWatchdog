@@ -32,9 +32,10 @@ flowchart LR
 - [ ] **Phase 2: ยกระดับสู่ระบบจริง (Advanced CI/CD & Bio-inspired AI)**
   - [x] **Sequential Feature Extractor:** สร้าง `SequenceExtractor` ทำ Sliding Window (X -> y)
   - [x] **Sequential Model (DeepLog):** พัฒนา `DeepLogLSTMModel` (PyTorch LSTM Next-Event Predictor) 👈 *(ผ่านการทดสอบ 100%)*
-  - [ ] **Mock CI/CD Generator:** จำลองเหตุการณ์ Timeout, IAM Denied, OOM, Workflow Skipping
+  - [x] **CI/CD Benchmark & Ingestion:** สร้างชุดข้อมูล [cicd_benchmark.log](data/raw/cicd_benchmark.log), [cicd_benchmark_labels.csv](data/raw/cicd_benchmark_labels.csv) และ `CICDLogLoader`
+  - [x] **Evaluation Metrics Module:** พัฒนา `src/evaluation/metrics.py` คำนวณ Accuracy, Precision, Recall, F1-Score, Confusion Matrix
+  - [ ] **Root Cause Analysis & Explainer:** วิเคราะห์ชี้เป้าบรรทัด Log ที่เป็นต้นเหตุของปัญหา
   - [ ] **Bio-inspired Novelty Detector:** พัฒนา `FlyBrainModel` (จำลองวงจรสมองแมลงวัน Fruit Fly Olfactory Circuit)
-  - [ ] **Root Cause Analysis:** วิเคราะห์ชี้เป้าบรรทัด Log ที่เป็นต้นเหตุของปัญหา
 
 ---
 
@@ -90,7 +91,9 @@ AI Project/
 │   └── test_ingestion.py              # ชุดทดสอบอัตโนมัติของ Block 1
 ├── requirements.txt                   # รายการไลบรารีที่จำเป็น
 ├── PROJECT_ROADMAP.md                 # แผนการพัฒนาและติดตามความคืบหน้า (เอกสารนี้)
-├── SYSTEM_ARCHITECTURE.md             # ผังสถาปัตยกรรมระบบฉบับละเอียด (เปิดใน Obsidian)
+├── SYSTEM_ARCHITECTURE.md             # ผังสถาปัตยกรรมระบบ Map of Content (เปิดใน Obsidian)
+├── system_architecture/               # โฟลเดอร์แยกเอกสารสถาปัตยกรรมระบบ (01-06)
+├── RESEARCH_REFERENCES.md             # เอกสารอ้างอิงงานวิจัยวิชาการ
 └── README.md                          # บทสรุปย่อของโปรเจกต์
 ```
 

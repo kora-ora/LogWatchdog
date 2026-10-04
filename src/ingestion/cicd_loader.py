@@ -1,15 +1,16 @@
 from typing import Iterator
+import re
 from src.ingestion.base import BaseLogLoader
 
 
 class CICDLogLoader(BaseLogLoader):
     """
     🧱 [Lego Brick 1: CI/CD Implementation]
-    ตัวอ่านชุดข้อมูล Log จาก CI/CD Pipeline (เช่น GitHub Actions, GitLab CI)
+    ตัวอ่านและสกัด Log จากกระบวนการ CI/CD Pipeline (เช่น GitHub Actions)
     
     ลักษณะของ CI/CD Log:
-    - มักมี ISO Timestamp นำหน้า เช่น '2026-09-30T10:00:01Z'
-    - มี Tag กำกับ Step หรือ Workflow เช่น '[Step: Install]', '[Workflow: ci-build]'
+    - มี Timestamp, Level ([INFO], [WARN], [ERROR])
+    - มีระบุ Workflow, Step และ Run ID (เช่น 'Run_101' หรือ 'Run #101')
     """
 
     def __init__(self, file_path: str, encoding: str = "utf-8"):
@@ -17,15 +18,40 @@ class CICDLogLoader(BaseLogLoader):
         self.encoding = encoding
 
     def load(self) -> Iterator[str]:
-        """
-        TODO: เขียนโค้ดสำหรับอ่าน CI/CD Log ทีละบรรทัด
-        (ใช้แนวคิดแบบ Generator เช่นเดียวกับ HDFSLogLoader)
-        """
-        # ========================================================
-        # [พื้นที่สำหรับเขียนโค้ดเพิ่มเติมในอนาคต]
-        # ========================================================
         with open(self.file_path, "r", encoding=self.encoding) as f:
             for line in f:
-                cleaned = line.strip()
-                if cleaned:
-                    yield cleaned
+                clean = line.strip()
+                # ข้ามบรรทัดว่างและบรรทัดคอมเมนต์ (#)
+                if clean and not clean.startswith("#"):
+                    yield clean
+
+    @staticmethod
+    def extract_run_id(line: str) -> str:
+        """
+        [Helper Function]
+        ดึง Run ID จากบรรทัด Log CI/CD เช่น:
+        - '[Run: Run_101]' -> 'Run_101'
+        - 'Job started: Run #101' -> 'Run_101'
+        """
+        match = re.search(r"\[Run:\s*([^\]]+)\]", line)
+        if match:
+            return match.group(1).strip()
+
+        match_hash = re.search(r"Run\s*#(\d+)", line)
+        if match_hash:
+            return f"Run_{match_hash.group(1)}"
+
+        return "unknown_run"
+
+    @staticmethod
+    def extract_message(line: str) -> str:
+        """
+        [Helper Function]
+        ดึงเฉพาะเนื้อความจริงของ Log (Payload Message) โดยตัด Timestamp,
+        Log Level และ Run ID ออก เพื่อให้ Drain3 ขุดหา Template ได้อย่างถูกต้อง
+        """
+        return re.sub(
+            r"^\d{4}-\d{2}-\d{2}T\S+\s+\[\w+\]\s+(\[Run:\s*[^\]]+\]\s+)?",
+            "",
+            line
+        ).strip()
