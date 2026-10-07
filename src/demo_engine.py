@@ -393,12 +393,12 @@ DEMO_SHOWCASE_CASES: List[Dict[str, Any]] = [
     },
     {
         "case_id": "case_2",
-        "name": "Case 2: DataNode I/O Failure (Hardware/Network Error)",
-        "description": "ความล้มเหลวระดับฮาร์ดแวร์: เกิด IOException (Event 12 และ 13) และเกิดการสั่ง Retry ซ้ำหลายครั้ง",
-        "narrative": "เกิดข้อผิดพลาดทางกายภาพของดิสก์ ส่งผลให้เกิด IOException (E12, E13) และพยายาม Delete/Replicate ซ้ำซ้อน ทำให้ความยาวพุ่งไป 27 เหตุการณ์ ทั้ง iForest (ตรวจจับความถี่สูงผิดปกติ) และ DeepLog (ตรวจจับ Exception นอกลู่ทาง) จับได้ทั้งคู่",
-        "block_id": "blk_4516306414837452219",
+        "name": "Case 2: DataNode I/O Failure & Error Burst (Hardware/Network Error)",
+        "description": "ความล้มเหลวระดับฮาร์ดแวร์: เกิด IOException (Event 12 และ 13) พร้อม Error Burst และคำสั่งผิดปกติสลับขั้นตอน",
+        "narrative": "เกิดข้อผิดพลาดทางกายภาพของดิสก์ ส่งผลให้เกิด IOException (E12, E13) และข้อผิดพลาด BlockInfo not found (E11) พร้อมการรับบล็อกซ้ำซ้อน (E10) ทำให้ iForest (ตรวจจับเวกเตอร์ความถี่ผิดปกติเด่นชัด) และ DeepLog (ตรวจจับ Exception นอกไวยากรณ์) ตรวจพบความผิดปกติได้ทั้งคู่",
+        "block_id": "blk_3128396288715478146",
         "ground_truth": "Anomaly",
-        "events": [0, 0, 0, 6, 2, 3, 1, 2, 3, 2, 3, 1, 1, 12, 13, 0, 10, 11, 1, 1, 4, 5, 5, 5, 4, 4, 4],
+        "events": [0, 0, 0, 6, 2, 3, 2, 3, 2, 3, 1, 1, 1, 12, 13, 0, 11, 10, 1, 1, 4],
     },
     {
         "case_id": "case_3",
