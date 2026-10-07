@@ -52,7 +52,7 @@ def test_end_to_end_deeplog_pipeline():
     ทดสอบการไหลของระบบ DeepLog แบบครบวงจร (Block 1 -> 2 -> 3 -> 4):
     HDFSLogLoader -> DrainParser -> SequenceExtractor -> DeepLogLSTMModel
     """
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     extractor = SequenceExtractor(window_size=3)
 
@@ -89,7 +89,7 @@ def test_end_to_end_deeplog_pipeline():
 
 if __name__ == "__main__":
     print("=== ทดสอบ Full DeepLog Pipeline (LSTM Neural Network) ===\n")
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     extractor = SequenceExtractor(window_size=3)
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     print("✅ ฝึกสอนเสร็จสิ้น!\n")
 
     # 2. ทำนายผลและเทียบกับ Ground Truth
-    labels_df = pd.read_csv("data/raw/hdfs_labels_sample.csv").set_index("BlockId")
+    labels_df = pd.read_csv("data/raw/synthetic/hdfs_labels_sample.csv").set_index("BlockId")
 
     results = []
     for b_id, seq in session_sequences.items():

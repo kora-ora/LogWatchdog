@@ -23,7 +23,6 @@ flowchart TD
     subgraph ML_DL_Models["🧠 โมเดลปัญญาประดิษฐ์ (AI Models)"]
         M_iForest["📄 Isolation Forest<br/>(Liu et al., ICDM 2008)"]
         M_DeepLog["📄 DeepLog: 2-Layer LSTM<br/>(Du et al., ACM CCS 2017)"]
-        M_Fly["📄 Fruit Fly Olfactory Brain<br/>(Dasgupta et al., Science 2017)"]
     end
 
     subgraph Evaluation["📊 การประเมินผล (Evaluation & Metrics)"]
@@ -36,7 +35,6 @@ flowchart TD
 
     P_Drain -->|"Count Vectors"| M_iForest
     P_Drain -->|"Sliding Window Sequences"| M_DeepLog
-    P_Drain -.->|"Sparse Random Projection"| M_Fly
 
     M_iForest --> Eval_HDFS
     M_DeepLog --> Eval_CICD
@@ -47,8 +45,8 @@ flowchart TD
 | **DeepLog Architecture** | Du et al. (ACM CCS 2017)          | Academic Paper    | • 2-Layer LSTM Architecture<br>• Window Size ($w=3$)<br>• Top-$K$ Candidates Decision<br>• การส่งผ่านเฉพาะ $h_t$ ไม่ส่ง $C_t$ ข้ามเลเยอร์ |
 | **Drain Log Parser**     | He et al. (IEEE ICWS 2017)        | Academic Paper    | • Fixed-Depth Parse Tree ($Depth=4$)<br>• Prefix Token Clustering ลด Search Space เหลือ $O(1)$                                            |
 | **Isolation Forest**     | Liu et al. (IEEE ICDM 2008)       | Academic Paper    | • หลักการ Few & Different ในการตัดแยก Outlier<br>• Sub-sampling Size = 256 เพื่อแก้ Swamping & Masking                                    |
-| **Fruit Fly Novelty**    | Dasgupta et al. (Science 2017)    | Academic Paper    | • Random Projection (Mushroom Body)<br>• Winner-Take-All Sparse Hashing สำหรับ Edge AI                                                    |
-| **HDFS Dataset**         | Zhu et al. (ICSE 2019 / LogHub)   | Benchmark Dataset | • แหล่งข้อมูลมาตรฐานของ `HDFS_2k.log`<br>• Ground Truth Labels ระดับ Block ID                                                             |
+| **HDFS Dataset (LogHub)** | Zhu et al. (ICSE 2019 / LogHub)   | Benchmark Dataset | • แหล่งข้อมูลมาตรฐานของ `HDFS_2k.log`<br>• Ground Truth Labels ระดับ Block ID                                                             |
+| **HDFS Full Parquet**    | Hugging Face (`honicky/hdfs-logs-encoded-blocks`) | Benchmark Dataset | • ข้อมูล Log ทั้งระบบ 11 ล้านบรรทัดบีบอัดเป็น Parquet<br>• ใช้ในการทดสอบ Zero-OOV Sequential Anomaly ขนาดใหญ่ (5,000 Train / 2,793 Test) |
 | **CI/CD Benchmark**      | Beller et al. (MSR 2017 / GitHub) | Benchmark Dataset | • โครงสร้าง Log ของ GitHub Actions Runner<br>• จำลอง 5 Anomaly Patterns (Timeout, Test, OOM, Skip, IAM)                                   |
 
 ---
@@ -189,19 +187,22 @@ flowchart TD
 
 ---
 
-### 4. A Neural Algorithm for Fundamental Computing Problems (Fly Novelty Detection)
+### 3. ชุดข้อมูล HDFS Full Parquet Dataset (Hugging Face / Zero-OOV Benchmark)
 
-#bio-inspired #sparse-coding #random-projection #winner-take-all #science
+> [!ABSTRACT] ข้อมูลแหล่งที่มา (Attribution & Hugging Face Repository)
+> - **ชื่อชุดข้อมูล:** `honicky/hdfs-logs-encoded-blocks`
+> - 🌐 **Hugging Face Hub:** [https://huggingface.co/datasets/honicky/hdfs-logs-encoded-blocks](https://huggingface.co/datasets/honicky/hdfs-logs-encoded-blocks)
+> - **โครงสร้างข้อมูล:** ไฟล์ Apache Parquet บันทึก Block ID, ลำดับ Event ID (Integer Sequence) ที่ผ่านการ Tokenize มาจาก 11.1 ล้านบรรทัดของระบบ HDFS จริง
+> - **ขนาดในระบบ:** `train-00000-of-00003.parquet` (~55 MB, บรรจุ 150,000+ Block sequences)
 
-> [!ABSTRACT] ข้อมูลบรรณานุกรม (Citation)
-> - **ชื่อบทความ:** A neural algorithm for fundamental computing problems
-> - **ผู้แต่ง:** Sanjoy Dasgupta, Charles F. Stevens, Saket Navlakha (Salk Institute for Biological Studies & UC San Diego)
-> - **ตีพิมพ์ใน:** *Science*, Vol. 358, Issue 6364, 2017, pp. 793–796.
-> - **DOI / ลิงก์:** [10.1126/science.aam9868](https://doi.org/10.1126/science.aam9868)
-
-#### ประเด็นสำคัญที่นำมาใช้:
-1. **Mushroom Body Kenyon Cells:** การขยายมิติสัญญาณด้วย Random Projection และคัดกรอง 5% สูงสุดด้วย Winner-Take-All
-2. **ทางเลือกสำหรับ Edge Computing:** การตรวจจับความผิดปกติแบบประหยัดพลังงานโดยไม่ต้องใช้ Backpropagation
+#### 📌 ระเบียบวิธีทดสอบ Zero-OOV Sequential Anomaly (Pure Sequence Benchmark):
+- **ปัญหาทางระเบียบวิธีวิจัย:** หากชุดทดสอบมี Event ID ใหม่ที่โมเดลไม่เคยเห็นในตอนเทรน (Out-Of-Vocabulary: OOV) กฎง่ายๆ แบบ `if event not in vocab: flag anomaly` ก็สามารถทายถูกได้โดยไม่ต้องใช้โมเดล Deep Learning
+- **การพิสูจน์คุณค่าของโมเดล DeepLog LSTM:**
+  - สร้างชุดทดสอบที่ **กรอง OOV ออกทั้งหมด 100% (Zero-OOV)** โดยทุก Event ID ในลำดับต้องเป็นคำที่มีอยู่ใน Vocabulary ของโมเดลตอนเทรน
+  - **ผลการทดลองเปรียบเทียบ (Head-to-Head Benchmark):**
+    - **Rule-based OOV:** Recall = **0.00%** (จับความผิดปกติไม่ได้แม้แต่เคสเดียว เพราะไม่มีคำแปลกปลอม)
+    - **DeepLog LSTM (Option A):** Recall = **100.00%** (FN = 0 จาก 793 anomalies ทั้งหมด), Precision = 58.70%, F1 = 73.97%
+  - **บทสรุปทางวิชาการ:** พิสูจน์ได้อย่างโปร่งใสว่าโมเดล DeepLog LSTM สามารถเข้าใจ "ไวยากรณ์และลำดับขั้นตอนการทำงานของระบบ (Sequential Transition Grammar)" ได้จริง ไม่ใช่การจำคำศัพท์ OOV
 
 ---
 

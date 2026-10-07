@@ -51,7 +51,7 @@ def test_drain_parser_separates_different_logs():
 
 def test_integration_block1_and_block2():
     """ทดสอบการเชื่อมต่อจริงระหว่าง Block 1 (Loader) และ Block 2 (Parser)"""
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     
     total_parsed = 0
@@ -69,7 +69,7 @@ def test_integration_block1_and_block2():
 if __name__ == "__main__":
     # สามารถสั่งรันไฟล์นี้โดยตรงได้ด้วย python3 tests/test_parsers.py
     print("=== เริ่มการทดสอบ Block 2: DrainParser ===\n")
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     
     for i, line in enumerate(loader.load()):

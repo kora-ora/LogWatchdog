@@ -41,7 +41,7 @@ def test_end_to_end_block1_block2_block3():
     ทดสอบการไหลของข้อมูลต่อกัน 3 บล็อก (Block 1 + Block 2 + Block 3):
     HDFSLogLoader -> DrainParser -> CountVectorBuilder
     """
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     builder = CountVectorBuilder()
 
@@ -71,7 +71,7 @@ def test_end_to_end_block1_block2_block3():
 if __name__ == "__main__":
     print("=== ทดสอบการต่อประสาน Block 1 -> Block 2 -> Block 3 ===\n")
     
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     builder = CountVectorBuilder()
 

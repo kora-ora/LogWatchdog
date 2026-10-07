@@ -46,7 +46,6 @@ flowchart TD
         subgraph ModelOptions["โมเดลที่เลือกใช้งานตามเป้าหมาย (Swappable Core)"]
             M1["Isolation Forest\n(เน้นเร็ว / เหมาะกับ Count Anomaly)"]:::engineStyle
             M2["DeepLog (LSTM)\n(เน้นลำดับเวลา / เหมาะกับ Sequential Anomaly)"]:::engineStyle
-            M3["FlyBrain Circuit\n(Sparse Coding / เหมาะกับ Novelty Detection)"]:::engineStyle
         end
     end
 
@@ -76,11 +75,9 @@ flowchart TD
 
     CountVec --> M1
     SeqWindow --> M2
-    ParsedTokens --> M3
 
     M1 --> ScoreCalc
     M2 --> ScoreCalc
-    M3 --> ScoreCalc
 
     ScoreCalc --> DecisionCheck
     DecisionCheck -->|"ปกติ (No)"| NormalResult
@@ -108,8 +105,7 @@ flowchart TD
 
 ### Layer 3: แกนโมเดลตรวจจับแบบถอดเปลี่ยนได้ (Modular Core Detection Engine)
 - **Isolation Forest:** โมเดล Unsupervised Tree สำหรับการตัดแยกจุดผิดปกติจาก Count Vector อย่างรวดเร็ว
-- **DeepLog (LSTM):** นิวรอลเน็ตเวิร์ก 2 เลเยอร์ที่เรียนรู้ลำดับขั้นตอนการทำงานปกติ หากมี Event ผิดลำดับจะตรวจจับได้ทันที
-- **FlyBrain Circuit:** โครงข่ายแบบชีวภาพ (Fruit Fly Olfactory System) ใช้ Sparse Hashing สำหรับงาน Novelty Detection แบบประหยัดพลังงาน
+- **DeepLog (LSTM):** นิวรอลเน็ตเวิร์ก 2 เลเยอร์ที่เรียนรู้ลำดับขั้นตอนการทำงานปกติ หากมี Event ผิดลำดับจะตรวจจับได้ทันที (Sequential Anomaly Predictor)
 
 ### Layer 4: การคำนวณคะแนนและตัดสินผล (Decision & Scoring)
 - ประเมินคะแนน Anomaly Score หรือตรวจสอบว่า Target Event อยู่ในกลุ่ม Top-$K$ Candidates หรือไม่

@@ -13,7 +13,7 @@ def test_file_not_found_raises_error():
 
 def test_cicd_loader_loads_lines():
     """ทดสอบว่า CICDLogLoader สามารถอ่านไฟล์ได้ทีละบรรทัดและไม่มีบรรทัดว่าง"""
-    sample_path = "data/raw/cicd_sample.log"
+    sample_path = "data/raw/synthetic/cicd_sample.log"
     if not os.path.exists(sample_path):
         pytest.skip("ไม่พบไฟล์ cicd_sample.log")
         
@@ -38,7 +38,7 @@ def test_hdfs_loader_when_implemented():
     ทดสอบ HDFSLogLoader เมื่อคุณเขียนฟังก์ชัน load() เสร็จแล้ว
     (หากยังไม่เขียน จะ throw NotImplementedError ซึ่งถือว่าปกติในขั้นตอนนี้)
     """
-    sample_path = "data/raw/hdfs_sample.log"
+    sample_path = "data/raw/synthetic/hdfs_sample.log"
     if not os.path.exists(sample_path):
         pytest.skip("ไม่พบไฟล์ hdfs_sample.log")
         

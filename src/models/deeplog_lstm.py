@@ -48,6 +48,7 @@ class DeepLogLSTMModel(BaseAnomalyModel):
         lr: float = 0.01,
         epochs: int = 30,
         batch_size: int = 16,
+        min_session_length: Optional[int] = None,
         device: str = "cpu"
     ):
         self.vocab_size = vocab_size
@@ -56,6 +57,7 @@ class DeepLogLSTMModel(BaseAnomalyModel):
         self.lr = lr
         self.epochs = epochs
         self.batch_size = batch_size
+        self.min_session_length = min_session_length
         self.device = torch.device(device)
 
         # สร้างสมองกล DeepLogNetwork
@@ -112,11 +114,15 @@ class DeepLogLSTMModel(BaseAnomalyModel):
         if not sequence:
                 return 0
 
-        # 1. เช็ก Event แปลกปลอม
+        # 1. เช็ก Event แปลกปลอม (Deterministic OOV Guard)
         if any(e not in self.normal_vocab for e in sequence):
             return 1
 
-        # 2. จัดการความยาวสั้น ทำการ padding 
+        # 2. เช็กเซสชันแท้งกลางคัน/สั้นกว่าเกณฑ์ปกติ (Incomplete Session Guard)
+        if self.min_session_length is not None and len(sequence) < self.min_session_length:
+            return 1
+
+        # 3. จัดการความยาวสั้น ทำการ padding 
         seq = sequence
         if len(seq) <= self.window_size:
             seq = [0] * (self.window_size - len(seq) + 1) + seq
@@ -137,6 +143,52 @@ class DeepLogLSTMModel(BaseAnomalyModel):
                     return 1
 
         return 0
+
+    def inspect_session(self, sequence: List[int]) -> Dict[str, Any]:
+        """
+        ตรวจสอบสถิติเชิงลึกของลำดับเหตุการณ์ใน Session:
+        - is_anomaly: 1 หากพบ violation ใดๆ, 0 หากปกติ
+        - violation_count: จำนวนจุดที่หลุดจาก Top-K
+        - min_probability: ค่าความน่าจะเป็นต่ำสุดของเหตุการณ์ที่เกิดขึ้นจริง
+        - has_oov: พบ Token แปลกปลอมหรือไม่
+        """
+        if not sequence:
+            return {"is_anomaly": 0, "violation_count": 0, "min_probability": 1.0, "has_oov": False}
+
+        has_oov = any(e not in self.normal_vocab for e in sequence)
+        if has_oov:
+            return {"is_anomaly": 1, "violation_count": 1, "min_probability": 0.0, "has_oov": True}
+
+        seq = sequence
+        if len(seq) <= self.window_size:
+            seq = [0] * (self.window_size - len(seq) + 1) + seq
+
+        self.net.eval()
+        violation_count = 0
+        min_p = 1.0
+        with torch.no_grad():
+            for i in range(len(seq) - self.window_size):
+                window = seq[i : i + self.window_size]
+                actual_next = seq[i + self.window_size]
+
+                window_tensor = torch.tensor([window], dtype=torch.long).to(self.device)
+                logits = self.net(window_tensor)
+                probs = torch.softmax(logits, dim=-1).squeeze(0).cpu().numpy()
+                topk_candidates = np.argsort(probs)[::-1][:min(self.top_k, self.vocab_size)].tolist()
+
+                if actual_next not in topk_candidates:
+                    violation_count += 1
+                if actual_next < len(probs):
+                    act_p = float(probs[actual_next])
+                    if act_p < min_p:
+                        min_p = act_p
+
+        return {
+            "is_anomaly": 1 if violation_count > 0 else 0,
+            "violation_count": violation_count,
+            "min_probability": min_p,
+            "has_oov": False
+        }
 
 
 

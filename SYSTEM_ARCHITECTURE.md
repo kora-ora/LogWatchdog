@@ -29,6 +29,10 @@ flowchart TD
     subgraph Evaluation & Integrity
         T7["07. Evaluation & Zero-Leakage Audit<br/>(ระเบียบวิธีทดสอบ & ป้องกัน Data Leak)"]
     end
+
+    subgraph Explainability & Root Cause
+        T8["08. Root Cause Localization<br/>(Block 5 Explainer & Incident Report)"]
+    end
     
     Hub --> T1
     Hub --> T2
@@ -37,6 +41,7 @@ flowchart TD
     Hub --> T5
     Hub --> T6
     Hub --> T7
+    Hub --> T8
 
     T1 -.-> T2
     T2 -.-> T3
@@ -44,6 +49,7 @@ flowchart TD
     T4 -.-> T5
     T5 -.-> T6
     T6 -.-> T7
+    T7 -.-> T8
 ```
 
 ---
@@ -64,7 +70,7 @@ flowchart TD
 - **เนื้อหาหลัก:**
   - แนวคิดสถาปัตยกรรมตัวต่อเลโก้ (Lego Modularity) ที่แยกส่วนอิสระและเปลี่ยนโมเดลได้ทันที (Swappable Engine)
   - ตารางข้อต่อมาตรฐาน (**Standard Interfaces**) สำหรับนักพัฒนา: `BaseLogLoader`, `BaseLogParser`, `BaseFeatureExtractor`, `BaseAnomalyModel`, `BaseExplainer`
-  - แนวทางการต่อยอดจาก Phase 1 Baseline ไปสู่ Phase 2 CI/CD และการเสียบโมเดลทดลองใหม่ๆ (เช่น Bio-inspired FlyBrain)
+  - แนวทางการต่อยอดจาก Phase 1 Baseline ไปสู่ Phase 2 CI/CD และการเสียบโมเดลขั้นสูง (เช่น DeepLog LSTM หรือ LogBERT)
 
 ---
 
@@ -116,8 +122,19 @@ flowchart TD
 
 ---
 
+### 8. [08. การชี้เป้าและวิเคราะห์ต้นตอความผิดปกติ (Root Cause Localization & Block 5 Explainer)](system_architecture/08_root_cause_localization_explainer.md)
+- **ไฟล์:** `system_architecture/08_root_cause_localization_explainer.md` (หรือ `[[08_root_cause_localization_explainer]]`)
+- **เนื้อหาหลัก:**
+  - สถาปัตยกรรมของ **Lego Brick 5 (`DeepLogExplainer`)**
+  - กลไกการตรวจจับ 2 ชั้น: Unseen Event (OOV) และ Sequential Step Skipping
+  - การระบุพิกัดบรรทัดเกิดเหตุ (`[CULPRIT]`) และการสกัด Context Window
+  - การคำนวณและเปรียบเทียบสิ่งที่ AI คาดหวัง vs สิ่งที่เกิดขึ้นจริง (Expected Candidates % vs Reality)
+  - โครงสร้างรายงานการชันสูตรเชิงลึก (**Incident Diagnostic Report**)
+
+---
+
 ## 🔗 เอกสารที่เกี่ยวข้องใน Obsidian Vault
 
 - 📖 [[README]]: ข้อมูลภาพรวมโครงการและสารบัญหลัก
 - 🗺️ [[PROJECT_ROADMAP]]: แผนงานและสถานะความคืบหน้ารายเฟส (Block 1 - Block 5)
-- 📚 [[RESEARCH_AND_DATASET_REFERENCES]]: เอกสารอ้างอิงงานวิจัยวิชาการและชุดข้อมูล (DeepLog, Drain, Isolation Forest, Fly Novelty Detection, LogHub, CI/CD Benchmark)
+- 📚 [[RESEARCH_AND_DATASET_REFERENCES]]: เอกสารอ้างอิงงานวิจัยวิชาการและชุดข้อมูล (DeepLog, Drain, Isolation Forest, HDFS Parquet Benchmark, CI/CD Benchmark)

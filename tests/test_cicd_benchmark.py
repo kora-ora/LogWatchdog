@@ -15,7 +15,7 @@ from src.evaluation.metrics import calculate_metrics, format_classification_repo
 
 def test_cicd_loader():
     """ทดสอบการโหลด Log CI/CD และดึง Run ID"""
-    loader = CICDLogLoader("data/raw/cicd_benchmark.log")
+    loader = CICDLogLoader("data/raw/synthetic/cicd_benchmark.log")
     lines = list(loader.load())
     assert len(lines) > 50, "ควรมีบรรทัด Log ไม่ต่ำกว่า 50 บรรทัด"
 
@@ -47,8 +47,8 @@ def test_end_to_end_cicd_benchmark_deeplog():
     ทดสอบ End-to-End Pipeline บน CI/CD Benchmark จริง:
     CICDLogLoader -> DrainParser -> SequenceExtractor -> DeepLogLSTMModel -> Evaluation
     """
-    log_path = "data/raw/cicd_benchmark.log"
-    label_path = "data/raw/cicd_benchmark_labels.csv"
+    log_path = "data/raw/synthetic/cicd_benchmark.log"
+    label_path = "data/raw/synthetic/cicd_benchmark_labels.csv"
 
     loader = CICDLogLoader(log_path)
     all_lines = list(loader.load())
@@ -125,8 +125,8 @@ if __name__ == "__main__":
     print("🚀 เริ่มการทดสอบ CI/CD Benchmark & Evaluation Run (Strict Zero-Leakage)")
     print("=======================================================\n")
 
-    log_path = "data/raw/cicd_benchmark.log"
-    label_path = "data/raw/cicd_benchmark_labels.csv"
+    log_path = "data/raw/synthetic/cicd_benchmark.log"
+    label_path = "data/raw/synthetic/cicd_benchmark_labels.csv"
 
     loader = CICDLogLoader(log_path)
     all_lines = list(loader.load())

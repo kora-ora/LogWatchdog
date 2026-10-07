@@ -47,7 +47,7 @@ def test_end_to_end_full_pipeline():
     ทดสอบการต่อประสานครบ 4 บล็อก (End-to-End Pipeline):
     Block 1 (Loader) -> Block 2 (Parser) -> Block 3 (Feature) -> Block 4 (Model)
     """
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     builder = CountVectorBuilder()
 
@@ -75,7 +75,7 @@ def test_end_to_end_full_pipeline():
 
 if __name__ == "__main__":
     print("=== ทดสอบ Full Pipeline (Block 1 -> 2 -> 3 -> 4) ===\n")
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     builder = CountVectorBuilder()
 

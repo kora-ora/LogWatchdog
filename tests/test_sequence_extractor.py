@@ -53,7 +53,7 @@ def test_sequence_extractor_short_sequence_padding():
 
 def test_integration_with_real_hdfs_logs():
     """ทดสอบการเชื่อมต่อ Block 1 (Loader) -> Block 2 (Parser) -> SequenceExtractor"""
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     extractor = SequenceExtractor(window_size=3)
 
@@ -72,7 +72,7 @@ def test_integration_with_real_hdfs_logs():
 
 if __name__ == "__main__":
     print("=== ทดสอบการสร้างลำดับเวลา (Sequence Extractor) ===\n")
-    loader = HDFSLogLoader("data/raw/hdfs_sample.log")
+    loader = HDFSLogLoader("data/raw/synthetic/hdfs_sample.log")
     parser = DrainParser()
     extractor = SequenceExtractor(window_size=3)
 

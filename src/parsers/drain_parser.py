@@ -12,13 +12,22 @@ class DrainParser(BaseLogParser):
     พร้อมระบบ Regex Masking สำหรับแปลงตัวแปรผันแปร (Timestamp, IP, Paths, Versions, Numbers)
     """
 
-    def __init__(self, masking_instructions: Optional[List[MaskingInstruction]] = None):
+    def __init__(
+        self,
+        masking_instructions: Optional[List[MaskingInstruction]] = None,
+        sim_th: float = 0.7,
+        depth: int = 5
+    ):
         config = TemplateMinerConfig()
         config.profiling_enabled = False
+        config.drain_sim_th = sim_th
+        config.drain_depth = depth
         
         if masking_instructions is None:
-            # ชุด Regex Masking มาตรฐานสำหรับ Production CI/CD & System Logs
+            # ชุด Regex Masking มาตรฐานสำหรับ Production CI/CD & Distributed Systems (HDFS)
             config.masking_instructions = [
+                MaskingInstruction(r"blk_-?\d+", "<BLOCK_ID>"),
+                MaskingInstruction(r"(?:\d{1,3}\.){3}\d{1,3}(?::\d+)?", "<IP_PORT>"),
                 MaskingInstruction(r"\d{4}-\d{2}-\d{2}T[0-9:.]+Z?", "<TIMESTAMP>"),
                 MaskingInstruction(r"##\[\w+\]", "<MARKER>"),
                 MaskingInstruction(r"(/[\w.-]+)+", "<PATH>"),

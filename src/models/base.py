@@ -4,7 +4,7 @@ from typing import Any, Dict
 class BaseAnomalyModel(ABC):
     """
     [Block 4 - Foundational Interface]
-    สัญญามาตรฐานสำหรับชิ้นส่วนโมเดลตรวจจับความผิดปกติ (เช่น Isolation Forest, DeepLog, FlyBrain)
+    สัญญามาตรฐานสำหรับชิ้นส่วนโมเดลตรวจจับความผิดปกติ (เช่น Isolation Forest, DeepLog)
     """
 
     @abstractmethod

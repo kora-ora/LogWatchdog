@@ -68,6 +68,39 @@ class CountVectorBuilder(BaseFeatureExtractor):
         df.index.name = "session_id"
         return df
 
+    def transform(self, parsed_events: List[Dict[str, Any]]) -> pd.DataFrame:
+        """
+        แปลงข้อมูล Event ของรอบทดสอบ (Inference/Test) ให้ตรงกับ Feature Columns ที่เคย fit ไว้
+        """
+        if not self.feature_columns:
+            raise RuntimeError("CountVectorBuilder must be fitted before calling transform().")
+        if not parsed_events:
+            return pd.DataFrame(columns=self.feature_columns)
+
+        session_event_counts = defaultdict(Counter)
+        for event in parsed_events:
+            session_id = event.get("session_id", "unknown")
+            template_id = event.get("template_id")
+            if template_id is not None:
+                session_event_counts[session_id][template_id] += 1
+
+        col_id_map = {col: int(col[1:]) for col in self.feature_columns if col.startswith("E") and col[1:].isdigit()}
+
+        rows = []
+        session_indices = []
+        for session_id, event_counts in session_event_counts.items():
+            row_data = [event_counts.get(col_id_map.get(col), 0) for col in self.feature_columns]
+            rows.append(row_data)
+            session_indices.append(session_id)
+
+        df = pd.DataFrame(
+            data=rows,
+            index=session_indices,
+            columns=self.feature_columns
+        )
+        df.index.name = "session_id"
+        return df
+
     def get_feature_names(self) -> List[str]:
         """ดึงรายชื่อ Feature Columns ทั้งหมด"""
         return self.feature_columns

@@ -39,7 +39,6 @@ flowchart LR
     subgraph Brick4["🧱 Block 4: Anomaly Model"]
         M1["IsolationForestModel"]
         M2["DeepLogLSTMModel"]
-        M3["FlyBrainModel"]
     end
     class Brick4 b4;
 
@@ -74,7 +73,7 @@ flowchart LR
 > [!TIP] ทำไมการออกแบบด้วยสถาปัตยกรรมนี้จึงทรงพลัง?
 > 1. **เริ่มง่าย (Phase 1 Baseline):** เริ่มต้นประกอบ `HDFSLoader` + `Drain3Parser` + `CountVectorBuilder` + `IsolationForestModel` เข้าด้วยกันเพื่อทำ Baseline และส่งมอบชิ้นงานแรกได้ทันที
 > 2. **ยกระดับง่าย (Phase 2 CI/CD):** เมื่อต้องการตรวจจับความผิดปกติเชิงลำดับ (Sequential Anomaly) ก็เพียงแค่เปลี่ยนเลโก้ `Feature` เป็น `SequenceExtractor` และเปลี่ยน `Model` เป็น `DeepLogLSTMModel` โดยที่ `Ingestion` และ `Parser` ยังคงใช้ตัวเดิม 100%
-> 3. **ทดลองสิ่งใหม่ได้อิสระ:** หากต้องการทดสอบโมเดลทางเลือก (เช่น Bio-inspired Fruit Fly Brain) ก็สร้าง Class `FlyBrainModel` มาเสียบแทนที่ใน Block 4 ได้เลยโดยไม่ต้องแตะต้องส่วนอื่น
+> 3. **ทดลองสิ่งใหม่ได้อิสระ:** หากต้องการทดสอบโมเดลทางเลือก (เช่น Transformer-based LogBERT หรือ Autoencoder) ก็สร้าง Class โมเดลใหม่ตาม `BaseAnomalyModel` มาเสียบแทนที่ใน Block 4 ได้เลยโดยไม่ต้องแตะต้องส่วนอื่น
 
 ---
 

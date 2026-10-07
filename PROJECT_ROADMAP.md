@@ -9,17 +9,18 @@
 
 ## 1. สถานะความคืบหน้าของโปรเจกต์ (Project Progress Tracker)
 
-> [!IMPORTANT] สรุปสถานะภาพรวมของโปรเจกต์ (Overall Progress: ~75% - 80%)
+> [!IMPORTANT] สรุปสถานะภาพรวมของโปรเจกต์ (Overall Progress: ~90%)
 > • **Phase 0 (Setup & Architecture):** 100% ✅ (เสร็จสมบูรณ์)
 > • **Phase 1 (Baseline Isolation Forest):** 100% ✅ (เสร็จสมบูรณ์)
-> • **Phase 2 (DeepLog LSTM & Real GHA Production Evaluation):** 85% 🔄 (แกนหลัก AI และการทดสอบกับ Real Logs เสร็จสิ้น)
-> • **Phase 3 (Root Cause Analysis & Explainability):** 0% ⏳ (ขั้นตอนถัดไป: ชี้เป้าบรรทัด Log ที่เป็นต้นตอ)
+> • **Phase 2 (DeepLog LSTM & Real GHA Production Evaluation):** 100% ✅ (เสร็จสมบูรณ์)
+> • **Phase 3 (Root Cause Analysis & Explainers - Block 5):** 100% ✅ (เสร็จสมบูรณ์)
+> • **Phase 4 (Alerting & Production Integration):** 0% ⏳ (ขั้นตอนสุดท้าย: ระบบแจ้งเตือน Webhook/Slack)
 
 ```mermaid
 flowchart LR
     P0["✅ Phase 0\nProject Setup\n& Architecture\n(100%)"] --> P1["✅ Phase 1\nBaseline System\n(Isolation Forest)\n(100%)"]
-    P1 --> P2["🔄 Phase 2\nAdvanced CI/CD\n(DeepLog + Real GHA)\n(85%)"]
-    P2 --> P3["⏳ Phase 3\nRoot Cause Analysis\n& Explainers\n(รอพัฒนา)"]
+    P1 --> P2["✅ Phase 2\nAdvanced CI/CD\n(DeepLog + Real GHA)\n(100%)"]
+    P2 --> P3["✅ Phase 3\nRoot Cause Analysis\n(DeepLogExplainer)\n(100%)"]
     P3 --> P4["⏳ Phase 4\nAlerting & CI/CD\nAction Integration\n(รอพัฒนา)"]
 ```
 
@@ -34,7 +35,7 @@ flowchart LR
   - [x] **Block 3 (Feature):** สร้าง `CountVectorBuilder` นับความถี่ Template ต่อ Block ID
   - [x] **Block 4 (Model):** พัฒนาและเทรน `IsolationForestModel` (Unsupervised Detection)
   - [x] **Block 5 (Evaluation):** ตรวจสอบความถูกต้องร่วมกับ Ground Truth Labels
-- [x] **Phase 2: ยกระดับสู่ระบบจริง (Advanced CI/CD Sequential AI) (~85%)**
+- [x] **Phase 2: ยกระดับสู่ระบบจริง (Advanced CI/CD Sequential AI) (100%)**
   - [x] **Sequential Feature Extractor:** สร้าง `SequenceExtractor` ทำ Sliding Window ($w=3$)
   - [x] **Sequential Model (DeepLog):** พัฒนา `DeepLogLSTMModel` (PyTorch 2-Layer LSTM + Adam + Top-$K$)
   - [x] **Zero-Leakage Pipeline:** อัปเกรดโหมด Read-Only Inference (`miner.match()`) ใน `DrainParser` เพื่อป้องกัน Data Leakage
@@ -42,12 +43,21 @@ flowchart LR
   - [x] **Real-world GitHub Actions Dataset:** ดาวน์โหลดและทดสอบกับ Log จริง 45,234 บรรทัดจาก `D2KLab/gha-dataset`
   - [x] **Master Production Pipeline:** พัฒนา [`main.py`](main.py) รัน End-to-End บน Production Logs โดยตรง (ได้ F1 = 85.71%)
   - [x] **Evaluation Metrics Module:** พัฒนา `src/evaluation/metrics.py` คำนวณ Accuracy, Precision, Recall, F1-Score
-- [ ] **Phase 3: วิเคราะห์ต้นตอความผิดปกติและการรายงานผล (Root Cause & Explainability) (0%)**
-  - [ ] **Root Cause Localization (Block 5 Explainer):** พัฒนา `BaseExplainer` และ `DeepLogExplainer` เพื่อชี้เป้าบรรทัด Log ที่เป็นต้นเหตุ
-  - [ ] **Anomaly Summary Report:** สรุปว่าเกิดจาก Step ไหน ข้ามขั้นตอนอะไร หรือเกิด Error ข้อความใด
-- [ ] **Phase 4: บูรณาการและระบบแจ้งเตือน (Production Readiness & Alerts) (0%)**
-  - [ ] **Alerting Hook:** ส่งการแจ้งเตือนเมื่อพบ Anomaly (เช่น Slack / Webhook / Console Summary)
-  - [ ] **Optional Edge Model:** พัฒนา `FlyBrainModel` (Fruit Fly Olfactory Circuit) สำหรับ Edge Computing
+- [x] **Phase 3: วิเคราะห์ต้นตอความผิดปกติและการรายงานผล (Root Cause & Explainability) (100%)**
+  - [x] **Root Cause Localization (Block 5 Explainer):** พัฒนา `DeepLogExplainer` ([`src/explainers/deeplog_explainer.py`](src/explainers/deeplog_explainer.py))
+  - [x] **Two-Tier Incident Diagnostic:** ชี้เป้าทั้งเคสข้อความแปลกปลอม (OOV) และเคสข้ามขั้นตอน (Sequential Step Skipping)
+  - [x] **Context Window Extraction:** ดึงบรรทัด Log 2 บรรทัดก่อนหน้า, บรรทัดเกิดเหตุ (`[CULPRIT]`), และบรรทัดถัดไป
+  - [x] **Hybrid Dual-Engine Detector (Block 4 Extension):** พัฒนา `HybridLogDetector` ([`src/models/hybrid_detector.py`](src/models/hybrid_detector.py)) ผสานพลัง iForest + DeepLog LSTM ด้วยกลยุทธ์ OR-Voting (Union Strategy) สำหรับ Max Sensitivity และ SRE Incident Alerting
+  - [x] **LogHub HDFS World-Standard Benchmark:** ทดสอบบนข้อมูลระดับโลก 104,815 บรรทัด (7,940 Blocks) จาก Amazon EC2 200+ Nodes พร้อมเฉลย Ground-Truth จากวิศวกร Hadoop
+  - [x] **Zero-OOV Sequence Benchmark (Pure LSTM Proof):** พิสูจน์ขีดความสามารถการตรวจจับ Sequential Anomaly ของ DeepLog LSTM ล้วนๆ บนชุดข้อมูล HDFS Parquet ระดับ 57,507 Blocks โดยตัด Rule OOV ออก 100% (พิสูจน์ว่า Rule OOV ได้ Recall 0.0% แต่ DeepLog LSTM ตรวจจับได้ Recall ~68-76%, F1 ~75%) ([`experiments/benchmark_in_vocab_hdfs.py`](experiments/benchmark_in_vocab_hdfs.py))
+  - [x] **False Negative / False Positive Optimization (Option A):** ชันสูตรหาสาเหตุเชิงลึกของ FP และ FN พร้อมแก้ไขด้วย Frequency Pruning กรอง Noise ออกจาก Train Set และปรับ `Top-K = 3` บรรลุผลสัมฤทธิ์ **Recall 100.00% (FN = 0), F1-Score 73.97%, Accuracy 80.02%**
+  - [x] **Master Production Pipeline Upgrade:** บูรณาการโหมด `--dataset hdfs_ai` ลงใน [`main.py`](main.py) เป็นค่าเริ่มต้น พร้อมรายงาน Confusion Matrix และ Explainer สำหรับการ Demo สด
+  - [x] **Strict Data Provenance & Directory Organization:** จัดระเบียบแยกชุดข้อมูลจริงและข้อมูลสังเคราะห์ ลบชุดข้อมูลขยะที่ไม่ได้ใช้งาน คืนพื้นที่ ~100 MB ([`data/raw/README.md`](data/raw/README.md))
+  - [x] **Unit Testing:** ผ่านชุดทดสอบครบถ้วน 29/29 ข้อ (`tests/`)
+- [ ] **Phase 4: บูรณาการส่วนต่อประสานและระบบนำเสนอ (Presentation & Deployment) (75%)**
+  - [x] **Master CLI Pipeline:** รองรับการเรียกทดสอบผ่าน CLI พร้อม Confusion Matrix และ Explainer ([`main.py`](main.py))
+  - [x] **Interactive Web Demo Dashboard:** สร้างเว็บแดชบอร์ดด้วย Streamlit แสดงผลเปรียบเทียบแยกระหว่างโมเดลเดี่ยว (iForest, DeepLog) และระบบ Hybrid Dual-Engine พร้อมการวิเคราะห์นิติวิทยาศาสตร์และการทดสอบสด ([`app.py`](app.py))
+  - [ ] **Alerting Hook:** ส่งการแจ้งเตือนเมื่อพบ Anomaly (เช่น Slack / Webhook / Incident Summary)
 
 ---
 
@@ -57,7 +67,7 @@ flowchart LR
 | :--- | :--- | :--- | :--- |
 | **Isolation Forest** | Frequency / Count Anomaly | สุ่มตัดแบ่งข้อมูล (Tree Partitioning) ข้อมูลที่ผิดปกติจะถูกแยกเดี่ยวได้เร็วกว่าปกติ | ทำงานเร็วมาก ไม่ต้องใช้ GPU เหมาะเป็น Baseline |
 | **DeepLog (LSTM)** | Sequential Anomaly | โครงข่ายประสาทเทียมจำลอง "ระบบเดาคำถัดไป" เรียนรู้ลำดับขั้นตอนปกติ หากเจอลำดับผิดคิวจะแจ้งเตือน | จับปัญหาขั้นตอนสลับที่หรือข้ามขั้นตอนได้ดีเยี่ยม |
-| **FlyBrain Circuit** *(ทางเลือก)* | Novelty / Out-of-Distribution | จำลองวงจรเห็ดสมองแมลงวัน (Mushroom Body: Kenyon Cells + APL) ผ่าน Sparse Random Projection | เบามาก ระดับ $O(1)$ ไม่ต้องใช้ Backpropagation |
+| **Hybrid Ensemble** | Multi-faceted Anomaly | รวมพลัง iForest + DeepLog LSTM ด้วยกลยุทธ์ OR-Voting | ตรวจจับครอบคลุมทั้งมิติความถี่และมิติลำดับเวลา |
 
 ---
 

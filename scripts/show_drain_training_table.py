@@ -14,7 +14,7 @@ def display_drain_training_data():
     ฟังก์ชันเปิดกล่องดำ (White-Box Inspection):
     แสดงข้อมูลที่ส่งเข้าฝึกสอน DrainParser และผลลัพธ์การขุด Template
     """
-    log_path = "data/raw/cicd_benchmark.log"
+    log_path = "data/raw/synthetic/cicd_benchmark.log"
     loader = CICDLogLoader(log_path)
     parser = DrainParser()
 
