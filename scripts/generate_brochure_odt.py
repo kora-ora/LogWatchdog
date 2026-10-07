@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
-Script สำหรับสร้างแผ่นพับขนาด A4 แนวนอน (A4 Landscape Tri-Fold Brochure / Pamphlet)
+สคริปต์สำหรับสร้างแผ่นพับขนาด A4 แนวนอน (A4 Landscape Tri-Fold Brochure / Pamphlet)
 สำหรับโครงงาน LogWatchdog: ระบบตรวจจับและระบุสาเหตุความผิดปกติใน System Logs
 ด้วยสถาปัตยกรรม Hybrid Dual-Engine (Isolation Forest + DeepLog LSTM) พร้อมกลไก Cascaded Synergy
 
-การแสดงผลตัวอักษร:
-- ใช้ฟอนต์ TH SarabunPSK มาตรฐานราชการและวิชาการไทย ปราศจากกล่องข้อความสี่เหลี่ยม (Tofu-free)
-- ใช้สัญลักษณ์ Typography สากล (◆, ▶, ●, ✓) แทนการใช้ Emoji เพื่อความคมชัดระดับวารสารวิชาการ
-- ขนาดและระยะขอบคำนวณอย่างแม่นยำให้จบใน 2 หน้า A4 แนวนอน (หน้า 1 ด้านนอก, หน้า 2 ด้านใน) พับ 3 ตอนได้สมบูรณ์แบบ
+การออกแบบตามหลักวิชาการและประชาสัมพันธ์:
+1. เป้าหมาย: เข้าใจใน 30 วินาที ว่าระบบแก้ปัญหาอะไร
+2. สารหลัก: "LogWatchdog จับทั้ง Log ที่มี Error และ Log ที่ลำดับขั้นตอนผิด แล้วชี้บรรทัดต้นเหตุให้ทันที"
+3. ผัง 6 แผง Tri-Fold (หน้านอก: แผงพับเข้า | ปกหลัง | ปกหน้า, หน้าใน: ปัญหา -> วิธีแก้ -> ผลลัพธ์)
+4. รูปภาพประกอบความละเอียดสูง (300 DPI) ลดความหนาแน่นของข้อความ
+5. ฟอนต์ TH SarabunPSK มาตรฐานราชการ คมชัด ไม่มีกล่องสี่เหลี่ยม (Tofu-free)
+6. ตัวเลขถูกต้องสอดคล้องกับ Benchmark จริง 100% (37 Unit tests, FP iForest 178, FP Hybrid 286 ลด 46.9%)
 """
 
 import os
@@ -19,13 +22,15 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.oxml import parse_xml
 from docx.oxml.ns import nsdecls
 
+ASSETS_DIR = "/home/kora/Project/AI Project/assets/brochure"
+
 def set_cell_background(cell, fill_hex):
     """กำหนดสีพื้นหลังของเซลล์"""
     tcPr = cell._tc.get_or_add_tcPr()
     shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{fill_hex}"/>')
     tcPr.append(shd)
 
-def set_cell_margins(cell, top=20, bottom=20, left=50, right=50):
+def set_cell_margins(cell, top=15, bottom=15, left=45, right=45):
     """กำหนดระยะขอบภายในเซลล์ (dxa: 1 pt = 20 dxa)"""
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = parse_xml(
@@ -52,7 +57,7 @@ def set_table_borders(table, color="CBD5E1", sz="4", val="single"):
     )
     tblPr.append(borders)
 
-def add_run_psk(p, text, size_pt=11.0, bold=False, italic=False, color=RGBColor(0x2D, 0x37, 0x48)):
+def add_run_psk(p, text, size_pt=10.5, bold=False, italic=False, color=RGBColor(0x2D, 0x37, 0x48)):
     """เพิ่มข้อความด้วยฟอนต์ TH SarabunPSK อย่างถูกต้องสมบูรณ์"""
     r = p.add_run(text)
     r.font.name = "TH SarabunPSK"
@@ -73,370 +78,440 @@ def add_p_banner(cell, title_th, title_en=None, icon=None, bg_color="1A365D"):
     pPr.append(shd)
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(0)
-    p.paragraph_format.space_after = Pt(2.5)
+    p.paragraph_format.space_after = Pt(2.0)
     p.paragraph_format.line_spacing = 1.05
 
     prefix = f"{icon} " if icon else ""
-    add_run_psk(p, prefix + title_th, size_pt=13.0, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
-
+    add_run_psk(p, prefix + title_th, size_pt=12.5, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
     if title_en:
-        p.add_run("\n")
-        add_run_psk(p, title_en, size_pt=9.5, italic=True, color=RGBColor(0xCB, 0xD5, 0xE1))
+        add_run_psk(p, f"\n{title_en}", size_pt=8.5, italic=True, color=RGBColor(0xE2, 0xE8, 0xF0))
+
+def add_image_box(cell, image_filename, width_in=3.45, space_before=2.0, space_after=3.0):
+    """เพิ่มรูปภาพประกอบลงในเซลล์ จัดกึ่งกลางพอดีขอบ"""
+    img_path = os.path.join(ASSETS_DIR, image_filename)
+    if not os.path.exists(img_path):
+        return None
+    p = cell.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p.paragraph_format.space_before = Pt(space_before)
+    p.paragraph_format.space_after = Pt(space_after)
+    p.paragraph_format.line_spacing = 1.0
+    r = p.add_run()
+    r.add_picture(img_path, width=Inches(width_in))
     return p
 
-def add_p_card(cell, bold_title, lines, left_color="2B6CB0", bg_color="F8FAFC", title_rgb=RGBColor(0x1A, 0x36, 0x5D), space_after=Pt(1.5)):
-    """สร้างกล่องการ์ดข้อความ (Card Box) ที่มีแถบสีเด่นด้านซ้ายและพื้นหลังสีนวล"""
+def add_styled_card_p(cell, title, items, border_color="2B6CB0", bg_fill="F8FAFC", space_before=2.5, space_after=3.0):
+    """สร้างกล่องข้อความแบบกระชับ (Card) โดยใช้ Paragraph Border & Shading"""
     p = cell.add_paragraph()
+    p.paragraph_format.space_before = Pt(space_before)
+    p.paragraph_format.space_after = Pt(space_after)
+    p.paragraph_format.line_spacing = 1.08
     pPr = p._p.get_or_add_pPr()
-    pBdr = parse_xml(r"""
-        <w:pBdr %s>
-            <w:left w:val="single" w:sz="18" w:space="5" w:color="%s"/>
-            <w:top w:val="none"/><w:right w:val="none"/><w:bottom w:val="none"/>
-        </w:pBdr>
-    """ % (nsdecls("w"), left_color))
-    shd = parse_xml(r"""<w:shd %s w:fill="%s"/>""" % (nsdecls("w"), bg_color))
+
+    # Border ด้านซ้าย หนา 18 (2.25 pt)
+    pBdr = parse_xml(
+        f'<w:pBdr {nsdecls("w")}>'
+        f'<w:left w:val="single" w:sz="18" w:space="8" w:color="{border_color}"/>'
+        f'<w:top w:val="none"/><w:right w:val="none"/><w:bottom w:val="none"/>'
+        f'</w:pBdr>'
+    )
     pPr.append(pBdr)
-    pPr.append(shd)
-    p.paragraph_format.space_before = Pt(1)
-    p.paragraph_format.space_after = space_after
-    p.paragraph_format.line_spacing = 1.05
-    p.paragraph_format.left_indent = Inches(0.06)
 
-    if bold_title:
-        add_run_psk(p, bold_title + "\n", size_pt=11.5, bold=True, color=title_rgb)
+    # Shading สีพื้นหลัง
+    if bg_fill:
+        shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="{bg_fill}"/>')
+        pPr.append(shd)
 
-    for idx, line in enumerate(lines):
-        add_run_psk(p, line, size_pt=10.5, color=RGBColor(0x2D, 0x37, 0x48))
-        if idx < len(lines) - 1:
-            p.add_run("\n")
-    return p
+    # Title
+    if title:
+        r_title = p.add_run(f"{title}\n")
+        r_title.font.name = "TH SarabunPSK"
+        r_title.font.size = Pt(11.0)
+        r_title.bold = True
+        r_title.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D)
+        rFonts = parse_xml(r"""<w:rFonts %s w:ascii="TH SarabunPSK" w:hAnsi="TH SarabunPSK" w:cs="TH SarabunPSK"/>""" % nsdecls("w"))
+        r_title._r.get_or_add_rPr().append(rFonts)
 
-def add_p(cell, text, bold_prefix=None, size=10.5, color=RGBColor(0x2D, 0x37, 0x48), space_after=Pt(2), line_spacing=1.05, align=WD_ALIGN_PARAGRAPH.LEFT):
-    """เพิ่มย่อหน้าข้อความทั่วไปพร้อมการจัดช่องว่างและฟอนต์มาตรฐาน"""
-    p = cell.add_paragraph()
-    p.alignment = align
-    p.paragraph_format.line_spacing = line_spacing
-    p.paragraph_format.space_after = space_after
-    if bold_prefix:
-        add_run_psk(p, bold_prefix + " ", size_pt=size, bold=True, color=RGBColor(0x1A, 0x36, 0x5D))
-    add_run_psk(p, text, size_pt=size, color=color)
-    return p
+    # Body lines
+    for i, itm in enumerate(items):
+        is_last = (i == len(items) - 1)
+        suffix = "" if is_last else "\n"
+        r_itm = p.add_run(f"{itm}{suffix}")
+        r_itm.font.name = "TH SarabunPSK"
+        r_itm.font.size = Pt(10.0)
+        r_itm.font.color.rgb = RGBColor(0x2D, 0x37, 0x48)
+        rFonts = parse_xml(r"""<w:rFonts %s w:ascii="TH SarabunPSK" w:hAnsi="TH SarabunPSK" w:cs="TH SarabunPSK"/>""" % nsdecls("w"))
+        r_itm._r.get_or_add_rPr().append(rFonts)
 
-def build_brochure():
-    doc = docx.Document()
-    sec = doc.sections[0]
+# ==============================================================================
+# 1. หน้านอก (Outside Spread: แผงพับเข้า | ปกหลัง | ปกหน้า)
+# ==============================================================================
 
-    # ตั้งค่ากระดาษ A4 แนวนอน (Landscape: 11.69" x 8.27")
-    sec.orientation = docx.enum.section.WD_ORIENT.LANDSCAPE
-    sec.page_width = Inches(11.69)
-    sec.page_height = Inches(8.27)
+def build_flap_panel(cell):
+    """แผง 3: แผงพับเข้า (Flap) - สิ่งแรกที่เห็นเมื่อเปิดอ่าน จุดเด่นและตัวเลขใหญ่ 3 ตัว"""
+    add_p_banner(cell, "จุดเด่นและตัวเลขสำคัญ", "Core Highlights & Benchmark Snapshot", icon="[ ◆ ]", bg_color="1A365D")
 
-    # ขอบกระดาษปรับแต่งเพื่อให้พอดี 2 หน้า A4 พอดี
-    sec.top_margin = Inches(0.24)
-    sec.bottom_margin = Inches(0.24)
-    sec.left_margin = Inches(0.28)
-    sec.right_margin = Inches(0.28)
+    # ภาพ KPI Metrics Cards (Recall 100%, F1 84.72%, FP -46.9%)
+    add_image_box(cell, "kpi_metrics_card.png", width_in=3.45, space_before=2.0, space_after=2.5)
 
-    COL_W = Inches(3.68)
-    COLOR_PRIMARY = RGBColor(0x1A, 0x36, 0x5D)    # Deep Navy
-    COLOR_SECONDARY = RGBColor(0x2B, 0x6C, 0xB0)  # Slate Blue
-    COLOR_TEXT = RGBColor(0x2D, 0x37, 0x48)       # Charcoal
-    COLOR_MUTED = RGBColor(0x64, 0x74, 0x8B)      # Slate Gray
-    COLOR_SUCCESS = RGBColor(0x16, 0x65, 0x34)    # Forest Green
-    COLOR_ALERT = RGBColor(0x99, 0x1B, 0x1B)      # Dark Red
+    # Card 1: ทำไมต้อง LogWatchdog?
+    add_styled_card_p(
+        cell,
+        "◆ ทำไมต้องเลือกระบบ LogWatchdog?",
+        [
+            "• แก้ปัญหาคอขวด: ก้าวข้าม Regex ที่ตาบอดต่อลำดับเหตุการณ์",
+            "• ผสาน 2 ขุมพลัง AI: จับทั้งความถี่ผิดปกติ (Count) และลำดับผิดพลาด (Sequence)",
+            "• ตัดเสียงรบกวน 46.9%: กลไก Cascaded Synergy คัดกรอง False Alarm ทิ้ง",
+            "• ชี้เป้าต้นเหตุทันที: สกัด 5 บรรทัดแวดล้อม ระบุ Culprit Line ตรงจุด"
+        ],
+        border_color="2B6CB0", bg_fill="F8FAFC", space_before=2.0, space_after=2.5
+    )
 
-    # =========================================================================
-    # หน้า 1: ด้านนอก (OUTSIDE - 3 PANELS)
-    # [Panel 3: Highlights] | [Panel 2: Back Cover] | [Panel 1: Front Cover]
-    # =========================================================================
-    tbl_out = doc.add_table(rows=1, cols=3)
-    tbl_out.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tbl_out.autofit = False
-    for col in tbl_out.columns:
-        col.width = COL_W
-    for c in tbl_out.rows[0].cells:
-        set_cell_margins(c, top=20, bottom=20, left=45, right=45)
+    # Card 2: คุณค่าระดับวิศวกรรมระบบ (Engineering Values)
+    add_styled_card_p(
+        cell,
+        "◆ ประสิทธิภาพเชิงวิศวกรรมระบบ",
+        [
+            "✓ วิเคราะห์ได้ระดับมิลลิวินาที/Session บน CPU ทั่วไป (ไม่ต้องพึ่งพา GPU)",
+            "✓ ตัดปัญหา Alert Fatigue ช่วยให้วิศวกรโฟกัสเฉพาะปัญหาที่เกิดขึ้นจริง",
+            "✓ Zero-Leakage Data Pipeline: รับประกันความถูกต้องตามระเบียบวิธีวิจัย",
+            "✓ สกัดแม่พิมพ์ Log อัตโนมัติด้วย Drain3 ปรับตัวเข้ากับ Log รูปแบบใหม่ได้ทันที"
+        ],
+        border_color="276749", bg_fill="F0FFF4", space_before=2.0, space_after=1.0
+    )
 
-    p3_cell, p2_cell, p1_cell = tbl_out.rows[0].cells
 
-    # -------------------------------------------------------------------------
-    # PANEL 3 (ซ้ายของหน้า 1): ภาพรวมและจุดเด่นนวัตกรรม (Highlights)
-    # -------------------------------------------------------------------------
-    add_p_banner(p3_cell, "ภาพรวมและจุดเด่นนวัตกรรม", "Core Highlights & Value Proposition", icon="[●]", bg_color="1A365D")
-    add_p(p3_cell, "ในระบบ Big Data การตรวจจับปัญหาจาก Log ด้วย Regex แบบเดิมจับลำดับที่ผิดปกติไม่ได้ ขณะที่โมเดลเดี่ยวก็แจ้งเตือนพร่ำเพรื่อ LogWatchdog จึงผสาน 2 ขุมพลัง AI เพื่อแก้ปัญหานี้โดยเฉพาะ",
-          bold_prefix="ความจำเป็น:", size=10.0, space_after=Pt(2.5))
+def build_back_cover_panel(cell):
+    """แผง 2: ปกหลัง (Back Cover) - คณะผู้จัดทำ, ที่ปรึกษา, Tech Stack, CTA และการอ้างอิง"""
+    add_p_banner(cell, "ข้อมูลโครงงานและคณะผู้จัดทำ", "Project Team & Academic Credits", icon="[ ◆ ]", bg_color="1A365D")
 
-    add_p_card(p3_cell, "◆ 3 เสาหลักนวัตกรรมของ LogWatchdog", [
-        "1. Dual-Perspective Engine: ตรวจจับทั้งมิติความถี่ (Count Outlier) และมิติลำดับเวลา (Sequential Workflow)",
-        "2. Cascaded Noise Suppression: ใช้ Isolation Forest เป็นตัวกรองช่วยตัด False Alarm จากเธรดสลับ",
-        "3. White-Box Explainability: เจาะจงบรรทัดต้นเหตุ (Culprit Line) ดึงบริบท 5 บรรทัดมาแสดงทันที"
-    ], left_color="2B6CB0", bg_color="F1F5F9", title_rgb=COLOR_PRIMARY)
+    # Card 1: คณะผู้พัฒนาและที่ปรึกษา
+    add_styled_card_p(
+        cell,
+        "◆ คณะผู้จัดทำ & คณาจารย์ที่ปรึกษา",
+        [
+            "ผู้พัฒนา: นายกรวิชญ์ คงคล้าย (Korawit Kongkhlai)",
+            "รหัสนักศึกษา: 6710110006  |  Section: 01",
+            "สาขาวิชาวิศวกรรมคอมพิวเตอร์ ภาควิชาวิศวกรรมคอมพิวเตอร์",
+            "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+            "อาจารย์ที่ปรึกษา: ดร. อนันท์ ชยกสิริวงศ์, ดร. วรินทร โรจนกรินทร์",
+            "รายวิชา 240-318 AI&ML (ปีการศึกษา 2569/1)"
+        ],
+        border_color="1A365D", bg_fill="F8FAFC", space_before=2.0, space_after=2.5
+    )
 
-    add_p_card(p3_cell, "◆ บทพิสูจน์เชิงตัวเลข (Benchmark Snapshot)", [
-        "✓ Recall: 100.00% (ตรวจจับความผิดปกติได้ครบทุกเคส)",
-        "✓ Precision: 73.49% (สูงกว่า LSTM เดี่ยว +13.96%)",
-        "✓ F1-Score: 84.72% (ยกระดับสูงสุดในทุกการทดสอบ)",
-        "✓ False Alarms Cut: ลดลง 46.9% จาก 539 เหลือ 286"
-    ], left_color="166534", bg_color="F0FDF4", title_rgb=COLOR_SUCCESS)
+    # Card 2: สถาปัตยกรรม & เทคโนโลยี (Tech Stack)
+    add_styled_card_p(
+        cell,
+        "◆ สถาปัตยกรรมและเทคโนโลยีที่ใช้ (Tech Stack)",
+        [
+            "• Core AI: PyTorch (2-Layer LSTM) + Scikit-learn (Isolation Forest)",
+            "• Log Parser: Drain3 Template Miner (LogHub Standard)",
+            "• Interactive UI: Streamlit + Altair Data Visualization",
+            "• Code Quality: Automated Unit Tests ผ่าน 37/37 ข้อ ครบ 100% (pytest)"
+        ],
+        border_color="2B6CB0", bg_fill="EBF8FF", space_before=2.0, space_after=2.5
+    )
 
-    add_p(p3_cell, "ลดระยะเวลากู้คืนระบบ (MTTR) เหลือไม่ถึง 1 วินาที และตัดปัญหา Alert Fatigue ได้อย่างเด็ดขาด พร้อมทำงานรวดเร็วบน CPU ทั่วไป",
-          bold_prefix="คุณค่าเชิงวิศวกรรม:", size=10.0, space_after=Pt(0))
+    # Card 3: การทดสอบและการเข้าถึง (CTA & Repository)
+    add_styled_card_p(
+        cell,
+        "◆ การสาธิตระบบและซอร์สโค้ด (Demonstration & Code)",
+        [
+            "• ขอเชิญรับชม Live Demonstration ได้ที่บูธนำเสนอโครงงาน",
+            "• ทดสอบผ่าน Web Dashboard ในเครื่อง: http://localhost:8501",
+            "• Source Code & Documentation: github.com/kora-ora/LogWatchdog",
+            "• เอกสารอ้างอิงหลัก: DeepLog (CCS'17), iForest (ICDM'08), LogHub (ICSE'19)"
+        ],
+        border_color="276749", bg_fill="F0FFF4", space_before=2.0, space_after=1.0
+    )
 
-    # -------------------------------------------------------------------------
-    # PANEL 2 (กลางของหน้า 1): แผงหลัง (Back Cover - ผู้จัดทำและที่ปรึกษา)
-    # -------------------------------------------------------------------------
-    add_p_banner(p2_cell, "ข้อมูลโครงงานและคณะผู้จัดทำ", "Project Team & Academic Credits", icon="[●]", bg_color="2B6CB0")
 
-    add_p_card(p2_cell, "◆ ผู้พัฒนาโครงงาน (Developer)", [
-        "นายกรวิชญ์ คงคล้าย (Korawit Kongkhlai)",
-        "รหัสนักศึกษา: 6710110006  |  Section: 01",
-        "สาขาวิชาวิศวกรรมคอมพิวเตอร์ ภาควิชาวิศวกรรมคอมพิวเตอร์",
-        "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยสงขลานครินทร์"
-    ], left_color="2B6CB0", bg_color="F8FAFC")
+def build_front_cover_panel(cell):
+    """แผง 1: ปกหน้า (Front Cover) - ดึงความสนใจ สารหลัก 1 ประโยค และภาพเรดาร์"""
+    # หัวเรื่องรายวิชาและสถาบัน
+    p_inst = cell.paragraphs[0] if len(cell.paragraphs) == 1 and cell.paragraphs[0].text == "" else cell.add_paragraph()
+    p_inst.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_inst.paragraph_format.space_before = Pt(0)
+    p_inst.paragraph_format.space_after = Pt(2.0)
+    add_run_psk(p_inst, "รายวิชา 240-318 AI&ML | สาขาวิชาวิศวกรรมคอมพิวเตอร์ ม.อ.", size_pt=9.5, bold=True, color=RGBColor(0x4A, 0x55, 0x68))
 
-    add_p_card(p2_cell, "◆ คณาจารย์ที่ปรึกษา (Advisors)", [
-        "ดร. อนันท์ ชกสุริวงค์",
-        "ดร. วรินทร โรจนกรินทร์",
-        "รายวิชา 240-318 AI&ML (ปีการศึกษา 2569/1)"
-    ], left_color="1A365D", bg_color="F8FAFC")
+    # กล่องชื่อโครงการหลัก (Dark Hero Card)
+    p_hero = cell.add_paragraph()
+    p_hero.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_hero.paragraph_format.space_before = Pt(1.5)
+    p_hero.paragraph_format.space_after = Pt(2.5)
+    pPr_hero = p_hero._p.get_or_add_pPr()
+    shd_hero = parse_xml(r"""<w:shd %s w:fill="0F172A"/>""" % nsdecls("w"))
+    pPr_hero.append(shd_hero)
+    add_run_psk(p_hero, "LogWatchdog\n", size_pt=22.0, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
+    add_run_psk(p_hero, "ระบบตรวจจับและระบุสาเหตุความผิดปกติใน System Logs\n", size_pt=10.5, bold=True, color=RGBColor(0x38, 0xBD, 0xF8))
+    add_run_psk(p_hero, "Hybrid Dual-Engine: Isolation Forest + DeepLog LSTM", size_pt=8.5, italic=True, color=RGBColor(0x94, 0xA3, 0xB8))
 
-    add_p_card(p2_cell, "◆ สถาปัตยกรรมและเทคโนโลยี (Tech Stack)", [
-        "• Core AI: PyTorch (LSTM) + Scikit-learn (iForest)",
-        "• Log Parsing: Drain3 Template Miner (LogHub)",
-        "• Dashboard: Streamlit + Altair Data Visualization",
-        "• Quality: 37/37 Unit Tests ผ่าน 100% (pytest)"
-    ], left_color="D97706", bg_color="FFFBEB", title_rgb=RGBColor(0xB4, 0x53, 0x09))
+    # สารหลัก (1 ประโยคเด่น)
+    p_msg = cell.add_paragraph()
+    p_msg.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_msg.paragraph_format.space_before = Pt(2.0)
+    p_msg.paragraph_format.space_after = Pt(2.5)
+    add_run_psk(p_msg, "“ ไม่ใช่แค่จับ Error แต่จับลำดับที่ผิด\nและบอกว่าผิดที่บรรทัดไหนทันที ”", size_pt=11.5, bold=True, color=RGBColor(0x1A, 0x36, 0x5D))
 
-    add_p_card(p2_cell, "◆ ระบบทดสอบและสาธิตสด (Interactive Demo)", [
-        "• Streamlit Web App: http://localhost:8501",
-        "• รองรับ Live Inference จำลอง 3 เคสจริง",
-        "• รายงาน Incident Report แบบ JSON / Markdown"
-    ], left_color="166534", bg_color="F0FDF4", title_rgb=COLOR_SUCCESS)
+    # ภาพ Radar Graphic
+    add_image_box(cell, "cover_badge.png", width_in=3.45, space_before=1.5, space_after=2.5)
 
-    add_p(p2_cell, "อ้างอิง: DeepLog (ACM CCS 2017), Isolation Forest (IEEE ICDM 2008), LogHub Benchmark (ICSE 2019)",
-          size=9.0, color=COLOR_MUTED, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=Pt(0))
+    # จุดเด่นสำคัญระดับองค์กร (Core Values Card)
+    add_styled_card_p(
+        cell,
+        "◆ จุดเด่นนวัตกรรมระดับองค์กร (Core Values)",
+        [
+            "✓ ตรวจจับได้ครบ 100% Recall: ครอบคลุมทั้ง Error ชัดเจนและลำดับแอบแฝง",
+            "✓ ตัดการแจ้งเตือนพร่ำเพรื่อลง 46.9% ด้วยกลไก Cascaded Synergy",
+            "✓ Root Cause Localization: ชี้เป้าบรรทัดปัญหาพร้อมบริบท 5 บรรทัด",
+            "✓ Ultra-Lightweight: ประมวลผลระดับมิลลิวินาทีบน CPU โดยไม่ต้องใช้ GPU"
+        ],
+        border_color="276749", bg_fill="F0FFF4", space_before=1.5, space_after=2.0
+    )
 
-    # -------------------------------------------------------------------------
-    # PANEL 1 (ขวาของหน้า 1): หน้าปกหลัก (Front Cover)
-    # -------------------------------------------------------------------------
-    add_p(p1_cell, "รายวิชา 240-318 AI&ML | สาขาวิชาวิศวกรรมคอมพิวเตอร์ ม.อ.",
-          size=9.5, color=COLOR_MUTED, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=Pt(4))
+    # Footer สถาบัน
+    p_ft = cell.add_paragraph()
+    p_ft.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    p_ft.paragraph_format.space_before = Pt(1.5)
+    p_ft.paragraph_format.space_after = Pt(0)
+    add_run_psk(p_ft, "ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์\nมหาวิทยาลัยสงขลานครินทร์ วิทยาเขตหาดใหญ่", size_pt=9.0, bold=False, color=RGBColor(0x71, 0x80, 0x96))
 
-    # Front Cover Title Card
-    p_cov = p1_cell.add_paragraph()
-    pPr = p_cov._p.get_or_add_pPr()
-    shd = parse_xml(r"""<w:shd %s w:fill="1A365D"/>""" % nsdecls("w"))
-    pPr.append(shd)
-    p_cov.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_cov.paragraph_format.space_before = Pt(2)
-    p_cov.paragraph_format.space_after = Pt(4)
-    p_cov.paragraph_format.line_spacing = 1.1
 
-    add_run_psk(p_cov, "LogWatchdog\n", size_pt=22.0, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
-    add_run_psk(p_cov, "ระบบตรวจจับและระบุสาเหตุความผิดปกติใน System Logs\n", size_pt=12.5, bold=True, color=RGBColor(0x93, 0xC5, 0xFD))
-    add_run_psk(p_cov, "Hybrid Dual-Engine Architecture (Isolation Forest + DeepLog LSTM) with Cascaded Synergy",
-                size_pt=9.5, italic=True, color=RGBColor(0xCB, 0xD5, 0xE1))
+# ==============================================================================
+# 2. หน้าใน (Inside Spread: 4 ปัญหา -> 5 วิธีแก้ -> 6 ผลลัพธ์)
+# ==============================================================================
 
-    add_p(p1_cell, "ยกระดับการตรวจจับและสืบสวน Incident ในระบบกระจายศูนย์ (Big Data & Distributed Clusters) ก้าวข้ามขีดจำกัดของ Regex แบบเดิมด้วย AI สองขุมพลัง",
-          size=10.0, color=COLOR_PRIMARY, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=Pt(3))
+def build_problem_panel(cell):
+    """แผง 4: ปัญหาของการวิเคราะห์เดิม (The Problem & Pain Points) - ทำไมต้องมีระบบนี้"""
+    add_p_banner(cell, "ปัญหาของการวิเคราะห์เดิม", "The Big Challenge & Pain Points", icon="[ ◆ ]", bg_color="9B2C2C")
 
-    add_p_card(p1_cell, "◆ จุดเด่นสำคัญระดับองค์กร (Core Values)", [
-        "✓ Zero False Negatives: ตรวจจับได้ครบ 100.00% ไม่หลุดรอด",
-        "✓ Cascaded Noise Filter: ตัดการแจ้งเตือนพร่ำเพรื่อลง 46.9%",
-        "✓ Root Cause Localization: ชี้เป้าบรรทัดปัญหาพร้อมบริบท 5 บรรทัด",
-        "✓ Ultra Lightweight: ทำงานระดับมิลลิวินาทีบน CPU มาตรฐาน"
-    ], left_color="166534", bg_color="F0FDF4", title_rgb=COLOR_SUCCESS)
+    # Card 1: 4 อุปสรรควิกฤตของระบบ Log ในปัจจุบัน
+    add_styled_card_p(
+        cell,
+        "◆ 4 อุปสรรควิกฤตของ System Logs ขนาดใหญ่",
+        [
+            "1. ข้อมูลมหาศาล (Massive Volume): คลัสเตอร์ผลิต Log หลายล้านบรรทัด/ชม. คนตรวจไม่ไหว",
+            "2. Regex ล้มเหลว (Brittle): จับลำดับข้ามขั้นไม่ได้ หากไม่มีคำว่า 'Error' ปรากฏ",
+            "3. แจ้งเตือนล้นเกิน (Alert Fatigue): โมเดลเดี่ยวเตือนพร่ำเพรื่อจนทีมงานเพิกเฉย",
+            "4. ขาดการชี้เป้า (Black-box): โมเดลทั่วไปบอกแค่ผิดปกติ แต่ไม่บอกว่าผิดที่บรรทัดไหน"
+        ],
+        border_color="C53030", bg_fill="FFF5F5", space_before=2.0, space_after=2.5
+    )
 
-    add_p_card(p1_cell, "◆ เหมาะสำหรับผู้ใช้งาน (Target Users)", [
-        "• วิศวกรดูแลระบบ (Site Reliability Engineers - SREs)",
-        "• ทีม DevOps และ Cloud Infrastructure Engineers",
-        "• ผู้ดูแลคลัสเตอร์ประมวลผลขนาดใหญ่ (HDFS, Kubernetes)"
-    ], left_color="2B6CB0", bg_color="F8FAFC", title_rgb=COLOR_PRIMARY)
+    # ภาพ Infographic: Regex Blindness vs LogWatchdog
+    add_image_box(cell, "problem_comparison.png", width_in=3.45, space_before=1.5, space_after=2.5)
 
-    add_p(p1_cell, "ภาควิชาวิศวกรรมคอมพิวเตอร์ คณะวิศวกรรมศาสตร์\nมหาวิทยาลัยสงขลานครินทร์ วิทยาเขตหาดใหญ่",
-          size=9.5, color=COLOR_MUTED, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=Pt(0))
+    # Card 2: มิติความผิดปกติที่ต้องตรวจจับพร้อมกัน
+    add_styled_card_p(
+        cell,
+        "◆ สรุปแก่นปัญหา: มิติความผิดปกติ 2 ด้านที่ต้องตรวจคู่กัน",
+        [
+            "• มิติความถี่และปริมาณ (Count Outlier): Log บางประเภทพุ่งสูงหรือขาดหายผิดปกติ",
+            "• มิติลำดับขั้นตอน (Sequential Violation): ขั้นตอนการทำงานสลับ ข้าม หรือไม่สมบูรณ์",
+            "• ระบบ LogWatchdog จึงถูกออกแบบให้ครอบคลุมทั้ง 2 มิติอย่างสมบูรณ์แบบ"
+        ],
+        border_color="1A365D", bg_fill="F8FAFC", space_before=1.5, space_after=1.0
+    )
 
-    # =========================================================================
-    # หน้า 2: ด้านใน (INSIDE SPREAD - 3 PANELS เมื่อกางออกเต็ม)
-    # [Panel 4: The Problem] | [Panel 5: AI Architecture] | [Panel 6: Results & Demo]
-    # =========================================================================
-    doc.add_page_break()
 
-    tbl_in = doc.add_table(rows=1, cols=3)
-    tbl_in.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tbl_in.autofit = False
-    for col in tbl_in.columns:
-        col.width = COL_W
-    for c in tbl_in.rows[0].cells:
-        set_cell_margins(c, top=20, bottom=20, left=45, right=45)
+def build_architecture_panel(cell):
+    """แผง 5: สถาปัตยกรรม Hybrid Dual-Engine (AI Core & Pipeline) - ทำงานอย่างไร"""
+    add_p_banner(cell, "สถาปัตยกรรม Hybrid Dual-Engine", "AI Core & Cascaded Synergy", icon="[ ◆ ]", bg_color="1A365D")
 
-    p4_cell, p5_cell, p6_cell = tbl_in.rows[0].cells
+    # ภาพ Pipeline Diagram 5 บล็อก
+    add_image_box(cell, "pipeline_diagram.png", width_in=3.45, space_before=2.0, space_after=2.5)
 
-    # -------------------------------------------------------------------------
-    # PANEL 4 (ซ้ายของหน้า 2): ปัญหาและข้อจำกัดของการวิเคราะห์เดิม
-    # -------------------------------------------------------------------------
-    add_p_banner(p4_cell, "ปัญหาของการวิเคราะห์เดิม", "The Big Challenge & Pain Points", icon="[●]", bg_color="991B1B")
-    add_p(p4_cell, "System Event Logs เป็นแหล่งความจริงเชิงประจักษ์ (Ground Truth) เพียงแหล่งเดียวในระบบคอมพิวเตอร์ แต่วิศวกรต้องเผชิญกับ 4 อุปสรรควิกฤต:",
-          size=10.0, space_after=Pt(2.5))
+    # Card 1: 2 ขุมพลัง AI ที่เสริมจุดแข็งซึ่งกันและกัน
+    add_styled_card_p(
+        cell,
+        "◆ สองขุมพลัง AI เสริมจุดแข็งซึ่งกันและกัน (Dual Engines)",
+        [
+            "• Engine 1: Isolation Forest (100 Trees, Contamination 0.10)",
+            "  - วิเคราะห์ความถี่ด้วย Count Vector ตรวจจับเหตุการณ์ปริมาณผิดปกติ",
+            "• Engine 2: DeepLog (2-Layer LSTM, Hidden 32, Top-K=3)",
+            "  - ตรวจจับไวยากรณ์ลำดับการทำงานผ่าน Sliding Window (w=3)"
+        ],
+        border_color="2B6CB0", bg_fill="EBF8FF", space_before=1.5, space_after=2.5
+    )
 
-    add_p_card(p4_cell, "1. ข้อมูลมหาศาล (Massive Volume)", [
-        "คลัสเตอร์ Big Data ผลิต Log หลายล้านบรรทัด/ชม.",
-        "การตรวจสอบด้วยสายตามนุษย์ (Manual) เป็นไปไม่ได้"
-    ], left_color="991B1B", bg_color="FEF2F2", title_rgb=COLOR_ALERT)
+    # Card 2: กฎการตัดสินใจ Cascaded Synergy (ตัดเสียงรบกวน 46.9%)
+    add_styled_card_p(
+        cell,
+        "◆ กลไก Cascaded Synergy (Two-Tier Decision Logic)",
+        [
+            "1. Sequence Gate: หาก LSTM ตรวจพบ 0 violations ➔ สรุป Normal ทันที",
+            "2. Severity Rule: หาก LSTM พบผิดปกติรุนแรง (≥3) หรือ iForest ฟ้อง ➔ Anomaly",
+            "3. Noise Suppressor: หาก LSTM พบ 1-2 violations แต่ความถี่ปกติสมบูรณ์",
+            "   ➔ สรุป Normal (ตัด False Alarm จากการสลับเธรดทิ้งได้ถึง 46.9%!)"
+        ],
+        border_color="D69E2E", bg_fill="FEFCBF", space_before=1.5, space_after=1.0
+    )
 
-    add_p_card(p4_cell, "2. Regex & Keyword ล้มเหลว (Brittle)", [
-        "การค้นหาคำว่า 'Error' หรือ 'Failed' จับเคสสลับลำดับไม่ได้",
-        "เช่น คำสั่งลบไฟล์เกิดขึ้นก่อนเขียนเสร็จ แม้คำสั่งจะถูก",
-        "ตามไวยากรณ์และไม่มีคำว่า Error ปรากฏเลยก็ตาม"
-    ], left_color="991B1B", bg_color="FEF2F2", title_rgb=COLOR_ALERT)
 
-    add_p_card(p4_cell, "3. ภาวะแจ้งเตือนล้นเกิน (Alert Fatigue)", [
-        "โมเดลทั่วไปแจ้งเตือนพร่ำเพรื่อเมื่อเธรดสลับที่เล็กน้อย",
-        "ทำให้วิศวกรเกิดความล้าและมองข้ามวิกฤตจริงไป"
-    ], left_color="D97706", bg_color="FFFBEB", title_rgb=RGBColor(0xB4, 0x53, 0x09))
+def build_results_panel(cell):
+    """แผง 6: ผลการทดสอบเชิงประจักษ์ & แดชบอร์ด (Results & Forensic Web App) - พิสูจน์ว่าได้ผล"""
+    add_p_banner(cell, "ผลการทดสอบเชิงประจักษ์ & แดชบอร์ด", "Empirical Evaluation & Incident Forensics", icon="[ ◆ ]", bg_color="1A365D")
 
-    add_p_card(p4_cell, "4. ขาดการชี้เป้า (Black-box Invisibility)", [
-        "โมเดลส่วนใหญ่บอกแค่ 'ผิดปกติ' แต่ไม่บอกบรรทัดไหน",
-        "ทีมงานต้องเสียเวลาค้นหาต้นตอแบบสุ่ม (MTTR สูง)"
-    ], left_color="718096", bg_color="F8FAFC", title_rgb=COLOR_PRIMARY)
+    # ตารางเปรียบเทียบ 3 โมเดล (FP iForest = 178 ตามความจริง)
+    p_tintro = cell.add_paragraph()
+    p_tintro.paragraph_format.space_before = Pt(1.5)
+    p_tintro.paragraph_format.space_after = Pt(1.5)
+    add_run_psk(p_tintro, "Benchmark: ประเมินบนชุดทดสอบมาตรฐาน In-Vocabulary 2,793 เซสชัน:", size_pt=9.5, bold=True, color=RGBColor(0x1A, 0x36, 0x5D))
 
-    add_p(p4_cell, "ความผิดปกติในระบบมี 2 มิติที่ต้องตรวจจับพร้อมกัน: มิติความถี่ (Volumetric Outliers) และ มิติลำดับขั้นตอน (Sequential Path Permutations)",
-          bold_prefix="สรุปปัญหา:", size=9.8, space_after=Pt(0))
+    table = cell.add_table(rows=4, cols=5)
+    table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_table_borders(table, color="CBD5E1", sz="4", val="single")
 
-    # -------------------------------------------------------------------------
-    # PANEL 5 (กลางของหน้า 2): สถาปัตยกรรม Hybrid Dual-Engine
-    # -------------------------------------------------------------------------
-    add_p_banner(p5_cell, "สถาปัตยกรรม Hybrid Dual-Engine", "AI Core & Cascaded Synergy", icon="[●]", bg_color="1A365D")
+    col_widths = [Inches(0.95), Inches(0.60), Inches(0.60), Inches(0.60), Inches(0.70)]
+    for row in table.rows:
+        for idx, width in enumerate(col_widths):
+            row.cells[idx].width = width
 
-    add_p_card(p5_cell, "◆ 5-Brick Modular Workflow", [
-        "• B1 (Ingestion): สตรีม Log ดิบ กรองและจัดกลุ่มตาม Block ID",
-        "• B2 (Drain3 Parser): สกัดแม่พิมพ์ข้อความ แมปสู่ Event ID",
-        "• B3 (Features): สกัด Count Vector และ Sliding Window (w=3)",
-        "• B4 (Hybrid Core): รวม 2 ขุมพลัง AI ผ่าน Cascaded Synergy",
-        "• B5 (Explainer): ระบุ Culprit Line และดึงบริบท 5 บรรทัด"
-    ], left_color="2B6CB0", bg_color="F8FAFC", title_rgb=COLOR_PRIMARY)
-
-    add_p_card(p5_cell, "◆ 2 ขุมพลัง AI ที่ทำงานร่วมกัน", [
-        "▶ Engine 1: Isolation Forest (100 iTrees, contamination 0.10)",
-        "   ตรวจจับความผิดปกติเชิงความถี่และปริมาณ (Count Outlier)",
-        "▶ Engine 2: DeepLog 2-Layer LSTM (Embed 32, Hidden 32)",
-        "   ตรวจจับไวยากรณ์ลำดับการทำงานด้วยกฎ Top-K = 3"
-    ], left_color="1A365D", bg_color="EDF2F7", title_rgb=COLOR_PRIMARY)
-
-    add_p_card(p5_cell, "◆ กลไกตัดสินใจ Cascaded Synergy", [
-        "1. Sequence Gate: หาก LSTM ปกติ (0 violations) ➜ สรุป Normal",
-        "2. Severity Rule: หาก LSTM ผิดปกติรุนแรง (≥3 violations) หรือ iForest ฟ้องว่าความถี่ผิดปกติ ➜ สรุป Anomaly",
-        "3. Noise Suppressor: หาก LSTM พบ 1-2 violations แต่ iForest ยืนยันความถี่ปกติสมบูรณ์ ➜ ปรับเป็น Normal (ตัด False Alarm ทิ้ง!)"
-    ], left_color="166534", bg_color="F0FDF4", title_rgb=COLOR_SUCCESS)
-
-    add_p(p5_cell, "กลไกนี้ทำให้ระบบคงค่า Recall 100.00% ไว้ได้ พร้อมลด False Alarm ลงได้ถึง 46.9%!",
-          bold_prefix="ผลสำเร็จ:", size=10.0, color=COLOR_SUCCESS, space_after=Pt(0))
-
-    # -------------------------------------------------------------------------
-    # PANEL 6 (ขวาของหน้า 2): ผลการทดสอบเชิงประจักษ์ & แดชบอร์ด
-    # -------------------------------------------------------------------------
-    add_p_banner(p6_cell, "ผลการทดสอบเชิงประจักษ์ & แดชบอร์ด", "Empirical Evaluation & Web App", icon="[●]", bg_color="2B6CB0")
-
-    add_p(p6_cell, "ประเมินผลบนชุดทดสอบมาตรฐาน HDFS 2,793 เซสชัน:",
-          bold_prefix="Benchmark:", size=10.0, space_after=Pt(2))
-
-    # Mini table
-    tbl_res = p6_cell.add_table(rows=4, cols=5)
-    tbl_res.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tbl_res.autofit = False
-    set_table_borders(tbl_res, color="CBD5E1")
-
-    headers = ["โมเดล", "Recall", "Prec.", "F1", "FP (ลวง)"]
-    col_widths = [Inches(1.00), Inches(0.62), Inches(0.62), Inches(0.62), Inches(0.66)]
-
-    for j, h in enumerate(headers):
-        cell = tbl_res.cell(0, j)
-        cell.width = col_widths[j]
-        set_cell_background(cell, "1A365D")
-        set_cell_margins(cell, top=20, bottom=20, left=20, right=20)
-        p = cell.paragraphs[0]
+    # Header row
+    hdr_titles = ["โมเดล", "Recall", "Prec.", "F1", "FP (ลวง)"]
+    for idx, txt in enumerate(hdr_titles):
+        c = table.rows[0].cells[idx]
+        set_cell_background(c, "1A365D")
+        set_cell_margins(c, top=8, bottom=8, left=15, right=15)
+        p = c.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.space_before = Pt(0)
         p.paragraph_format.space_after = Pt(0)
-        add_run_psk(p, h, size_pt=9.5, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
+        add_run_psk(p, txt, size_pt=9.0, bold=True, color=RGBColor(0xFF, 0xFF, 0xFF))
 
-    rows_data = [
-        ("iForest", "28.25%", "55.72%", "37.49%", "179"),
+    # Data rows
+    row_data = [
+        ("iForest", "28.25%", "55.72%", "37.49%", "178"),
         ("DeepLog", "100.00%", "59.53%", "74.64%", "539"),
         ("Hybrid (เรา)", "100.00%", "73.49%", "84.72%", "286 (-47%)")
     ]
+    for r_idx, (m_name, rec, prec, f1, fp) in enumerate(row_data):
+        row_cells = table.rows[r_idx + 1].cells
+        bg_c = "EBF8FF" if r_idx == 2 else ("FFFFFF" if r_idx % 2 == 0 else "F8FAFC")
+        txt_c = RGBColor(0x1A, 0x36, 0x5D) if r_idx == 2 else RGBColor(0x2D, 0x37, 0x48)
+        is_b = (r_idx == 2)
 
-    for i, row in enumerate(rows_data):
-        for j, val in enumerate(row):
-            cell = tbl_res.cell(i + 1, j)
-            cell.width = col_widths[j]
-            bg = "EDF2F7" if i == 2 else ("FFFFFF" if i == 0 else "F8FAFC")
-            set_cell_background(cell, bg)
-            set_cell_margins(cell, top=15, bottom=15, left=20, right=20)
-            p = cell.paragraphs[0]
-            p.alignment = WD_ALIGN_PARAGRAPH.CENTER if j > 0 else WD_ALIGN_PARAGRAPH.LEFT
+        for c_idx, val in enumerate([m_name, rec, prec, f1, fp]):
+            c = row_cells[c_idx]
+            set_cell_background(c, bg_c)
+            set_cell_margins(c, top=7, bottom=7, left=15, right=15)
+            p = c.paragraphs[0]
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p.paragraph_format.space_before = Pt(0)
             p.paragraph_format.space_after = Pt(0)
-            is_hybrid = (i == 2)
-            c_rgb = COLOR_PRIMARY if is_hybrid else COLOR_TEXT
-            add_run_psk(p, val, size_pt=9.5, bold=is_hybrid, color=c_rgb)
+            add_run_psk(p, val, size_pt=8.8, bold=is_b, color=txt_c)
 
-    p6_cell.add_paragraph().paragraph_format.space_after = Pt(2)
+    # ภาพจำลอง Forensics & Culprit Line
+    add_image_box(cell, "forensics_preview.png", width_in=3.45, space_before=2.0, space_after=2.0)
 
-    add_p_card(p6_cell, "◆ นิติวิทยาศาสตร์ชี้เป้า (DeepLogExplainer)", [
-        "• ระบุ Culprit Line แม่นยำ: เช่น writeBlock received exception",
-        "• สกัด Context Window: แสดง 5 บรรทัดแวดล้อมก่อนและหลังจุดเกิดเหตุ",
-        "• แจกแจง Probability Distribution: แสดง Top-K คาดการณ์ vs Actual"
-    ], left_color="2B6CB0", bg_color="F8FAFC", title_rgb=COLOR_PRIMARY)
+    # Card: การชี้เป้าและการใช้งาน Streamlit
+    add_styled_card_p(
+        cell,
+        "◆ นิติวิทยาศาสตร์ชี้เป้า (DeepLogExplainer) & Web App",
+        [
+            "• ชี้เป้า Culprit Line: สกัดบรรทัดที่เกิดปัญหาพร้อมบริบท 5 บรรทัด",
+            "• แจกแจง Top-3 Softmax: แสดงสิ่งที่โมเดลคาดหวังเทียบกับเหตุการณ์จริง",
+            "• Streamlit 3-Tab: Benchmark Table, Forensic Explorer, Sequence Playground",
+            "• รันคำสั่งสาธิตง่ายๆ: ./run_demo.sh หรือ streamlit run app.py"
+        ],
+        border_color="276749", bg_fill="F0FFF4", space_before=1.5, space_after=1.0
+    )
 
-    add_p_card(p6_cell, "◆ Streamlit Web Application (4 แท็บพร้อมใช้งาน)", [
-        "1. Model Comparison: ดูกราฟแท่งเปรียบเทียบ 3 โมเดลสด",
-        "2. Forensics & Timeline: สืบสวนลำดับเหตุการณ์และชี้เป้าบรรทัดปัญหา",
-        "3. Live Playground: จำลองเคส Nominal, Fault, Permutation",
-        "4. Architecture Blueprint: แผนผัง Lego 5 บล็อกแบบ Interactive"
-    ], left_color="166534", bg_color="F0FDF4", title_rgb=COLOR_SUCCESS)
 
-    add_p(p6_cell, "พร้อมใช้งานผ่านคำสั่ง: ./run_demo.sh หรือ streamlit run app.py",
-          size=9.2, color=COLOR_MUTED, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=Pt(0))
+# ==============================================================================
+# Master Document Generation & PDF Export
+# ==============================================================================
+
+def generate_brochure():
+    print("Generating LogWatchdog A4 Landscape Tri-Fold Brochure...")
+
+    doc = docx.Document()
+
+    # ตั้งค่ากระดาษ A4 แนวนอน (Landscape: กว้าง 11.69 นิ้ว, สูง 8.27 นิ้ว)
+    section = doc.sections[0]
+    section.page_width = Inches(11.69)
+    section.page_height = Inches(8.27)
+    section.top_margin = Inches(0.24)
+    section.bottom_margin = Inches(0.24)
+    section.left_margin = Inches(0.28)
+    section.right_margin = Inches(0.28)
+
+    # ความกว้างแผง: (11.69 - 0.56) / 3 = 3.71 นิ้ว หักระยะห่างระหว่างคอลัมน์ เหลือ 3.65 นิ้ว
+    COL_WIDTH = Inches(3.65)
 
     # -------------------------------------------------------------------------
-    # บันทึกไฟล์ DOCX ชั่วคราว และแปลงเป็น ODT และ PDF
+    # หน้า 1: ด้านนอก (Outside Spread: แผงพับเข้า | ปกหลัง | ปกหน้า)
     # -------------------------------------------------------------------------
-    os.makedirs("scratch", exist_ok=True)
-    docx_path = "scratch/LogWatchdog_Brochure_A4_generated.docx"
-    odt_target = "LogWatchdog_Brochure_A4.odt"
-    pdf_target = "LogWatchdog_Brochure_A4.pdf"
+    table_outside = doc.add_table(rows=1, cols=3)
+    table_outside.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_table_borders(table_outside, color="E2E8F0", sz="2", val="single")
 
-    print(f"กำลังบันทึกไฟล์ชั่วคราว {docx_path}...")
+    row_out = table_outside.rows[0]
+    for c in row_out.cells:
+        c.width = COL_WIDTH
+        set_cell_margins(c, top=10, bottom=10, left=35, right=35)
+
+    print("Building Outside Spread (Flap, Back Cover, Front Cover)...")
+    build_flap_panel(row_out.cells[0])
+    build_back_cover_panel(row_out.cells[1])
+    build_front_cover_panel(row_out.cells[2])
+
+    # ขึ้นหน้าใหม่สำหรับหน้าใน
+    doc.add_page_break()
+
+    # -------------------------------------------------------------------------
+    # หน้า 2: ด้านใน (Inside Spread: ปัญหา -> วิธีแก้ -> ผลลัพธ์)
+    # -------------------------------------------------------------------------
+    table_inside = doc.add_table(rows=1, cols=3)
+    table_inside.alignment = WD_TABLE_ALIGNMENT.CENTER
+    set_table_borders(table_inside, color="E2E8F0", sz="2", val="single")
+
+    row_in = table_inside.rows[0]
+    for c in row_in.cells:
+        c.width = COL_WIDTH
+        set_cell_margins(c, top=10, bottom=10, left=35, right=35)
+
+    print("Building Inside Spread (Problem, AI Architecture, Empirical Results)...")
+    build_problem_panel(row_in.cells[0])
+    build_architecture_panel(row_in.cells[1])
+    build_results_panel(row_in.cells[2])
+
+    # บันทึกเป็นไฟล์ DOCX ชั่วคราว
+    docx_path = "/home/kora/Project/AI Project/scratch/LogWatchdog_Brochure_A4.docx"
+    os.makedirs(os.path.dirname(docx_path), exist_ok=True)
     doc.save(docx_path)
-    print("บันทึก DOCX สำเร็จ กำลังแปลงเป็น .odt และ .pdf ด้วย LibreOffice...")
+    print("Saved DOCX:", docx_path)
 
-    res_odt = subprocess.run(
-        ["libreoffice", "--headless", "--convert-to", "odt", docx_path, "--outdir", "."],
-        capture_output=True,
-        text=True
-    )
-    if res_odt.returncode != 0:
-        print("เกิดข้อผิดพลาดในการแปลง ODT:", res_odt.stderr)
-        raise RuntimeError(f"LibreOffice ODT conversion failed: {res_odt.stderr}")
+    # แปลงเป็น ODT และ PDF ด้วย LibreOffice Headless
+    odt_target = "/home/kora/Project/AI Project/LogWatchdog_Brochure_A4.odt"
+    pdf_target = "/home/kora/Project/AI Project/LogWatchdog_Brochure_A4.pdf"
 
-    generated_odt = "LogWatchdog_Brochure_A4_generated.odt"
-    if os.path.exists(generated_odt):
-        os.replace(generated_odt, odt_target)
-        print(f"บันทึกไฟล์แผ่นพับ ODT สำเร็จเป็น {odt_target}")
+    print("Converting to ODT via LibreOffice...")
+    cmd_odt = [
+        "libreoffice", "--headless", "--convert-to", "odt",
+        docx_path, "--outdir", "/home/kora/Project/AI Project"
+    ]
+    subprocess.run(cmd_odt, check=True)
 
-    res_pdf = subprocess.run(
-        ["libreoffice", "--headless", "--convert-to", "pdf", odt_target, "--outdir", "."],
-        capture_output=True,
-        text=True
-    )
-    if res_pdf.returncode != 0:
-        print("เกิดข้อผิดพลาดในการแปลง PDF:", res_pdf.stderr)
-        raise RuntimeError(f"LibreOffice PDF conversion failed: {res_pdf.stderr}")
+    print("Converting to PDF via LibreOffice...")
+    cmd_pdf = [
+        "libreoffice", "--headless", "--convert-to", "pdf",
+        odt_target, "--outdir", "/home/kora/Project/AI Project"
+    ]
+    subprocess.run(cmd_pdf, check=True)
 
-    file_size_odt = os.path.getsize(odt_target)
-    file_size_pdf = os.path.getsize(pdf_target)
-    print(f"สร้างไฟล์แผ่นพับเสร็จสมบูรณ์ทั้ง ODT และ PDF!")
-    print(f" - ODT: {odt_target} (ขนาด: {file_size_odt:,} ไบต์)")
-    print(f" - PDF: {pdf_target} (ขนาด: {file_size_pdf:,} ไบต์)")
+    print("Verifying PDF page count...")
+    cmd_info = ["pdfinfo", pdf_target]
+    res = subprocess.run(cmd_info, capture_output=True, text=True, check=True)
+    for line in res.stdout.splitlines():
+        if "Pages:" in line:
+            print(f"=== {line.strip()} ===")
+
+    print(f"\n[DONE] Brochure compiled successfully:")
+    print(f"ODT: {odt_target} ({os.path.getsize(odt_target)} bytes)")
+    print(f"PDF: {pdf_target} ({os.path.getsize(pdf_target)} bytes)")
 
 if __name__ == "__main__":
-    build_brochure()
+    generate_brochure()

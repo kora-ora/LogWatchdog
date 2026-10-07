@@ -96,7 +96,7 @@ streamlit run app.py
 ### 4. รันการตรวจสอบความถูกต้องของระบบ (Automated Tests)
 ```bash
 pytest tests/ -v
-# ผ่าน 29/29 tests ครบ 100%
+# ผ่าน 37/37 tests ครบ 100%
 ```
 
 ---
