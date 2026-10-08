@@ -124,14 +124,14 @@ flowchart TD
 
 ### 3. ตารางเปรียบเทียบชุดข้อมูลทั้งสองชุด (Dataset Comparison Matrix)
 
-| มิติการเปรียบเทียบ | ชุดข้อมูล HDFS Benchmark | ชุดข้อมูล CI/CD Benchmark |
-| :--- | :--- | :--- |
-| **โดเมนของระบบ (Domain)** | Distributed Storage (Big Data) | Continuous Integration / DevOps |
-| **Session Key (กุญแจจัดกลุ่ม)** | `Block ID` (`blk_*`) | `Run ID` (`Run_*`) |
-| **ประเภทความผิดปกติ** | DataNode Failure, Checksum Mismatch | Network Timeout, Test Fail, OOM, Step Skip, IAM |
-| **ลักษณะ Feature ที่ใช้** | Template Count Vector (ความถี่) | Sliding Window Sequence ($w=3$) (ลำดับเวลา) |
-| **โมเดล AI หลักที่ใช้** | Isolation Forest (Unsupervised) | DeepLog (2-Layer LSTM Next-Event Predictor) |
-| **การวัดผล (Evaluation)** | Outlier Detection บน Count Vector | Precision, Recall, F1-Score เทียบ Ground Truth |
+| มิติการเปรียบเทียบ              | ชุดข้อมูล HDFS Benchmark            | ชุดข้อมูล CI/CD Benchmark                       |
+| :------------------------------ | :---------------------------------- | :---------------------------------------------- |
+| **โดเมนของระบบ (Domain)**       | Distributed Storage (Big Data)      | Continuous Integration / DevOps                 |
+| **Session Key (กุญแจจัดกลุ่ม)** | `Block ID` (`blk_*`)                | `Run ID` (`Run_*`)                              |
+| **ประเภทความผิดปกติ**           | DataNode Failure, Checksum Mismatch | Network Timeout, Test Fail, OOM, Step Skip, IAM |
+| **ลักษณะ Feature ที่ใช้**       | Template Count Vector (ความถี่)     | Sliding Window Sequence ($w=3$) (ลำดับเวลา)     |
+| **โมเดล AI หลักที่ใช้**         | Isolation Forest (Unsupervised)     | DeepLog (2-Layer LSTM Next-Event Predictor)     |
+| **การวัดผล (Evaluation)**       | Outlier Detection บน Count Vector   | Precision, Recall, F1-Score เทียบ Ground Truth  |
 
 ---
 
