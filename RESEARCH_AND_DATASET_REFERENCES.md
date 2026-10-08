@@ -40,14 +40,14 @@ flowchart TD
     M_DeepLog --> Eval_CICD
 ```
 
-| หัวข้อ / องค์ประกอบ      | แหล่งอ้างอิง (Source / Paper)     | ประเภท (Type)     | จุดประเด็นทางเทคนิคที่นำมาใช้ในโปรเจกต์                                                                                                   |
-| :----------------------- | :-------------------------------- | :---------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| **DeepLog Architecture** | Du et al. (ACM CCS 2017)          | Academic Paper    | • 2-Layer LSTM Architecture<br>• Window Size ($w=3$)<br>• Top-$K$ Candidates Decision<br>• การส่งผ่านเฉพาะ $h_t$ ไม่ส่ง $C_t$ ข้ามเลเยอร์ |
-| **Drain Log Parser**     | He et al. (IEEE ICWS 2017)        | Academic Paper    | • Fixed-Depth Parse Tree ($Depth=4$)<br>• Prefix Token Clustering ลด Search Space เหลือ $O(1)$                                            |
-| **Isolation Forest**     | Liu et al. (IEEE ICDM 2008)       | Academic Paper    | • หลักการ Few & Different ในการตัดแยก Outlier<br>• Sub-sampling Size = 256 เพื่อแก้ Swamping & Masking                                    |
-| **HDFS Dataset (LogHub)** | Zhu et al. (ICSE 2019 / LogHub)   | Benchmark Dataset | • แหล่งข้อมูลมาตรฐานของ `HDFS_2k.log`<br>• Ground Truth Labels ระดับ Block ID                                                             |
-| **HDFS Full Parquet**    | Hugging Face (`honicky/hdfs-logs-encoded-blocks`) | Benchmark Dataset | • ข้อมูล Log ทั้งระบบ 11 ล้านบรรทัดบีบอัดเป็น Parquet<br>• ใช้ในการทดสอบ Zero-OOV Sequential Anomaly ขนาดใหญ่ (5,000 Train / 2,793 Test) |
-| **CI/CD Benchmark**      | Beller et al. (MSR 2017 / GitHub) | Benchmark Dataset | • โครงสร้าง Log ของ GitHub Actions Runner<br>• จำลอง 5 Anomaly Patterns (Timeout, Test, OOM, Skip, IAM)                                   |
+| หัวข้อ / องค์ประกอบ       | แหล่งอ้างอิง (Source / Paper)                     | ประเภท (Type)     | จุดประเด็นทางเทคนิคที่นำมาใช้ในโปรเจกต์                                                                                                   |
+| :------------------------ | :------------------------------------------------ | :---------------- | :---------------------------------------------------------------------------------------------------------------------------------------- |
+| **DeepLog Architecture**  | Du et al. (ACM CCS 2017)                          | Academic Paper    | • 2-Layer LSTM Architecture<br>• Window Size ($w=3$)<br>• Top-$K$ Candidates Decision<br>• การส่งผ่านเฉพาะ $h_t$ ไม่ส่ง $C_t$ ข้ามเลเยอร์ |
+| **Drain Log Parser**      | He et al. (IEEE ICWS 2017)                        | Academic Paper    | • Fixed-Depth Parse Tree ($Depth=4$)<br>• Prefix Token Clustering ลด Search Space เหลือ $O(1)$                                            |
+| **Isolation Forest**      | Liu et al. (IEEE ICDM 2008)                       | Academic Paper    | • หลักการ Few & Different ในการตัดแยก Outlier<br>• Sub-sampling Size = 256 เพื่อแก้ Swamping & Masking                                    |
+| **HDFS Dataset (LogHub)** | Zhu et al. (ICSE 2019 / LogHub)                   | Benchmark Dataset | • แหล่งข้อมูลมาตรฐานของ `HDFS_2k.log`<br>• Ground Truth Labels ระดับ Block ID                                                             |
+| **HDFS Full Parquet**     | Hugging Face (`honicky/hdfs-logs-encoded-blocks`) | Benchmark Dataset | • ข้อมูล Log ทั้งระบบ 11 ล้านบรรทัดบีบอัดเป็น Parquet<br>• ใช้ในการทดสอบ Zero-OOV Sequential Anomaly ขนาดใหญ่ (5,000 Train / 2,793 Test)  |
+| **CI/CD Benchmark**       | Beller et al. (MSR 2017 / GitHub)                 | Benchmark Dataset | • โครงสร้าง Log ของ GitHub Actions Runner<br>• จำลอง 5 Anomaly Patterns (Timeout, Test, OOM, Skip, IAM)                                   |
 
 ---
 

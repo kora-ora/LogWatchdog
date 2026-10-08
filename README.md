@@ -51,13 +51,13 @@ flowchart LR
 
 ### ผลลัพธ์บน Zero-OOV HDFS Dataset (5,000 Train / 2,793 Test Sequences):
 
-| มาตรวัด (Metric) | ผลลัพธ์ DeepLog LSTM (Option A) | ผลลัพธ์ Rule-based OOV |
-| :--- | :---: | :---: |
-| **Recall (ความไวต่อสิ่งผิดปกติ)** | **100.00% (793 / 793)** | **0.00% (0 / 793)** |
-| **False Negatives (FN)** | **0 (Zero Missed)** | **793 (หลุดรอดทั้งหมด)** |
-| **Precision** | **58.70%** | **0.00%** |
-| **F1-Score** | **73.97%** | **0.00%** |
-| **Accuracy** | **80.02%** | **71.61%** |
+| มาตรวัด (Metric)                  | ผลลัพธ์ DeepLog LSTM (Option A) |  ผลลัพธ์ Rule-based OOV  |
+| :-------------------------------- | :-----------------------------: | :----------------------: |
+| **Recall (ความไวต่อสิ่งผิดปกติ)** |     **100.00% (793 / 793)**     |   **0.00% (0 / 793)**    |
+| **False Negatives (FN)**          |       **0 (Zero Missed)**       | **793 (หลุดรอดทั้งหมด)** |
+| **Precision**                     |           **58.70%**            |        **0.00%**         |
+| **F1-Score**                      |           **73.97%**            |        **0.00%**         |
+| **Accuracy**                      |           **80.02%**            |        **71.61%**        |
 
 #### ตาราง Confusion Matrix (DeepLog LSTM):
 ```
@@ -78,10 +78,10 @@ pip install torch drain3 scikit-learn pandas pyarrow streamlit pytest
 
 ### 2. รันการทดสอบโมเดล AI ผ่าน CLI (Pipeline Execution)
 ```bash
-# รัน HDFS AI Pipeline (DeepLog LSTM + Confusion Matrix + Explainer รายงานสด)
+# รัน HDFS AI Hybrid Pipeline (Isolation Forest + DeepLog LSTM + Forensic Incident Report)
 python main.py
 
-# รัน CI/CD Diagnostic Pipeline (GitHub Actions Failure Diagnostic)
+# รัน CI/CD Diagnostic Pipeline (ทดสอบลำดับขั้นตอนบน CI/CD Benchmark)
 python main.py --dataset cicd
 ```
 
@@ -97,6 +97,16 @@ streamlit run app.py
 ```bash
 pytest tests/ -v
 # ผ่าน 37/37 tests ครบ 100%
+```
+
+### 5. (ทางเลือก) ดาวน์โหลดชุดข้อมูลดิบเต็มและฝึกสอนโมเดลใหม่ (Dataset & Retrain)
+โมเดล Pre-trained ถูกแนบมาให้รันได้ทันที หากต้องการดาวน์โหลดชุดข้อมูลจริง 11 ล้านบรรทัดเพื่อฝึกสอนใหม่:
+```bash
+# ดาวน์โหลดชุดข้อมูล HDFS Parquet อัตโนมัติจาก Hugging Face Datasets
+python scripts/download_data.py
+
+# บังคับฝึกสอนโมเดลใหม่ทั้งหมดจากข้อมูลดิบและสร้างแคชใหม่
+python main.py --retrain
 ```
 
 ---

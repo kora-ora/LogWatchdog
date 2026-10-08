@@ -177,6 +177,20 @@ with st.spinner("Loading Hybrid Dual-Engine models (iForest + DeepLog LSTM)...")
             st.cache_resource.clear()
             model, iforest_model, hybrid_detector, metadata, eval_df = train_and_cache_model(force_retrain=True)
             model_ready = True
+    except FileNotFoundError as e:
+        st.error("⚠️ ไม่พบโมเดลที่บันทึกไว้ใน models/ หรือชุดข้อมูล Parquet ใน data/raw/hdfs_full_parquet/")
+        st.info("""
+        **💡 คำแนะนำสำหรับผู้ใช้งานที่เพิ่ง Clone Repository มาใหม่:**
+        
+        ชุดข้อมูลขนาดใหญ่ไม่ได้ถูกเก็บไว้ใน Git ตามแนวปฏิบัติมาตรฐานสากล (Best Practice) คุณสามารถดาวน์โหลดชุดข้อมูล HDFS Benchmark ได้ง่ายๆ ผ่านคำสั่งใน Terminal:
+        
+        ```bash
+        python scripts/download_data.py
+        ```
+        
+        เมื่อดาวน์โหลดเสร็จแล้ว ให้กดปุ่ม **Rerun** ด้านขวาบน หรือกดปุ่ม **Retrain Model Checkpoints** บนเมนูด้านซ้ายเพื่อเริ่มวิเคราะห์ทันทีครับ!
+        """)
+        model_ready = False
     except Exception as e:
         st.error(f"Error loading model checkpoints: {e}")
         model_ready = False

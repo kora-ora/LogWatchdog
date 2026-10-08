@@ -44,11 +44,39 @@ ENV/
 *_backup.*
 *_before_*.*
 
-# Model checkpoints & serialized artifacts
+# Documents, Presentations & Office Files (Reports & Brochures)
+*.odt
+*.docx
+*.doc
+*.pdf
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+*.html
+
+# Images & Media Assets
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.webp
+*.gif
+*.bmp
+*.ico
+*.tiff
+
+# Model checkpoints & serialized artifacts (General)
 *.pt
 *.pth
 *.joblib
 *.pkl
+
+# Approach B: Track lightweight demo checkpoints (< 9 MB total for Zero-Friction Clone Execution)
+!models/deeplog_option_a.pt
+!models/iforest_model.pkl
+!models/demo_metadata.pkl
+!models/demo_eval_cache.pkl
 
 # Compressed archives & large datasets
 *.tar.gz
@@ -62,7 +90,7 @@ data/raw/hdfs_full_parquet/
 
 # Scratch & runtime artifacts
 scratch/
-reports/incidents/
+reports/
 
 # Test & coverage caches
 .pytest_cache/

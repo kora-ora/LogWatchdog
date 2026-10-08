@@ -30,6 +30,7 @@ import numpy as np
 import pandas as pd
 
 # นำเข้า Lego Bricks จาก src/
+from src.ingestion.cicd_loader import CICDLogLoader
 from src.parsers.drain_parser import DrainParser
 from src.features.count_vector import CountVectorBuilder
 from src.features.sequence_extractor import SequenceExtractor
@@ -63,9 +64,21 @@ def run_hdfs_hybrid_pipeline(force_retrain: bool = False):
     print(f"\n[สเต็ปที่ 1] {action_text}")
     t0 = time.time()
 
-    model, iforest_model, hybrid_detector, metadata, eval_df = train_and_cache_model(
-        force_retrain=force_retrain
-    )
+    try:
+        model, iforest_model, hybrid_detector, metadata, eval_df = train_and_cache_model(
+            force_retrain=force_retrain
+        )
+    except FileNotFoundError as e:
+        print("\n" + "=" * 80)
+        print("❌ ไม่พบไฟล์โมเดลแคชใน models/ หรือชุดข้อมูล Parquet ใน data/raw/hdfs_full_parquet/")
+        print("=" * 80)
+        print("📌 วิธีดำเนินการสำหรับผู้ที่เพิ่ง Clone โครงงานนี้มาใหม่:")
+        print("   1. ดาวน์โหลดชุดข้อมูล HDFS Benchmark จาก Hugging Face อัตโนมัติ:")
+        print("      👉 python scripts/download_data.py")
+        print("   2. หรือทดสอบ Pipeline บนชุดข้อมูล CI/CD Benchmark ที่ติดมากับ Repo ทันที:")
+        print("      👉 python main.py --dataset cicd")
+        print("=" * 80 + "\n")
+        return
 
     t_load = time.time() - t0
     status_str = "ฝึกสอนใหม่และบันทึกแคชสำเร็จ" if force_retrain else "โหลดโมเดลจากแคชพร้อมใช้งาน"
@@ -214,7 +227,9 @@ def run_gha_pipeline():
 
     real_dir = "data/raw/real_gha"
     if not os.path.exists(real_dir):
-        print(f"❌ ไม่พบโฟลเดอร์ {real_dir}")
+        print(f"⚠️ ไม่พบโฟลเดอร์ {real_dir} (Production Runner Logs)")
+        print("💡 กำลังสลับไปรันชุดข้อมูล CI/CD Benchmark ที่มาพร้อมกับ Repository โดยอัตโนมัติ...")
+        run_cicd_synthetic_pipeline()
         return
 
     test_files = sorted(glob.glob(f"{real_dir}/*Test*.txt"))
@@ -321,6 +336,120 @@ def run_gha_pipeline():
 
 
 # =============================================================================
+# ⚡ โหมดที่ 3: CI/CD Benchmark Synthetic Pipeline (--dataset cicd)
+# =============================================================================
+def run_cicd_synthetic_pipeline():
+    """
+    รันชุดทดสอบ CI/CD Benchmark บนข้อมูลสังเคราะห์ data/raw/synthetic/cicd_benchmark.log
+    ซึ่งติดมากับ Git Repository อยู่แล้ว ทำให้ผู้ที่ clone โปรเจกต์ไปสามารถทดสอบได้ทันที 100%
+    """
+    print("\n" + "=" * 80)
+    print("🚀 [โหมด CI/CD Benchmark] ทดสอบระบบบนชุดข้อมูล Tracked ใน Git (cicd_benchmark.log)")
+    print("=" * 80)
+
+    log_path = "data/raw/synthetic/cicd_benchmark.log"
+    label_path = "data/raw/synthetic/cicd_benchmark_labels.csv"
+
+    if not os.path.exists(log_path) or not os.path.exists(label_path):
+        print(f"❌ ไม่พบไฟล์ {log_path} หรือ {label_path}")
+        return
+
+    loader = CICDLogLoader(log_path)
+    all_lines = list(loader.load())
+
+    train_run_ids = set([f"Run_{i}" for i in range(101, 108)])
+    test_run_ids = [f"Run_{i}" for i in range(108, 116)]
+
+    train_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in train_run_ids]
+    test_lines = [l for l in all_lines if CICDLogLoader.extract_run_id(l) in set(test_run_ids)]
+
+    print(f"📦 จำนวนบรรทัด Log ทั้งหมด: {len(all_lines)} บรรทัด (Train: {len(train_lines)}, Test: {len(test_lines)})")
+    print(f"🏋️ [Training Set]  รอบปกติใช้สอนโมเดล (Normal Only): {len(train_run_ids)} runs ({sorted(list(train_run_ids))})")
+    print(f"🎯 [Test Set]      ข้อสอบ Unseen (Normal + Anomaly): {len(test_run_ids)} runs ({test_run_ids})\n")
+
+    parser = DrainParser()
+    train_events = []
+    for line in train_lines:
+        run_id = CICDLogLoader.extract_run_id(line)
+        clean_msg = CICDLogLoader.extract_message(line)
+        parsed = parser.parse_line(clean_msg, update_model=True)
+        train_events.append({
+            "session_id": run_id,
+            "template_id": parsed["template_id"],
+            "line": line
+        })
+
+    count_builder = CountVectorBuilder()
+    df_train_counts = count_builder.fit_transform(train_events)
+
+    extractor = SequenceExtractor(window_size=3)
+    train_seq_data = extractor.fit_transform(train_events)
+    train_vocab_size = train_seq_data["vocab_size"]
+    UNKNOWN_TOKEN = train_vocab_size
+
+    test_sessions = {r_id: [] for r_id in test_run_ids}
+    test_flat_events = []
+    for line in test_lines:
+        run_id = CICDLogLoader.extract_run_id(line)
+        clean_msg = CICDLogLoader.extract_message(line)
+        parsed = parser.parse_line(clean_msg, update_model=False)
+        tid = UNKNOWN_TOKEN if parsed["is_unseen"] else parsed["template_id"]
+        test_sessions[run_id].append(tid)
+        test_flat_events.append({
+            "session_id": run_id,
+            "template_id": tid
+        })
+
+    df_test_counts = count_builder.transform(test_flat_events).reindex(test_run_ids).fillna(0)
+
+    # ฝึกสอน iForest และ DeepLog LSTM
+    print("🤖 กำลังฝึกสอนโมเดลคู่ Isolation Forest + DeepLog LSTM...")
+    iforest = IsolationForestModel(n_estimators=100, contamination=0.1, random_state=42)
+    iforest.fit(df_train_counts.values)
+
+    deeplog = DeepLogLSTMModel(
+        vocab_size=train_vocab_size + 2,
+        window_size=3,
+        hidden_dim=32,
+        embedding_dim=32,
+        num_layers=2,
+        epochs=30,
+        lr=0.02,
+        top_k=2
+    )
+    deeplog.fit(train_seq_data["X"], train_seq_data["y"])
+    hybrid = HybridLogDetector(iforest, deeplog, strategy="synergy")
+    print("✅ ฝึกสอนเสร็จสิ้น! กำลังประเมินผลการตรวจจับ...")
+
+    labels_df = pd.read_csv(label_path).set_index("RunId")
+    y_true, y_pred, table_rows = [], [], []
+
+    for r_id in test_run_ids:
+        seq = test_sessions[r_id]
+        actual_label = labels_df.loc[r_id, "Label"]
+        actual = 1 if actual_label == "Anomaly" else 0
+        res = hybrid.predict_session(df_test_counts.loc[r_id].values, seq)
+        pred = res["prediction"]
+
+        y_true.append(actual)
+        y_pred.append(pred)
+
+        status = "✅ ถูกต้อง" if actual == pred else "❌ ผิดพลาด"
+        table_rows.append({
+            "Run ID": r_id,
+            "Ground Truth": actual_label,
+            "iForest": "🚨 Anomaly" if res["iforest_pred"] == 1 else "✅ Normal",
+            "DeepLog": "🚨 Anomaly" if res["deeplog_pred"] == 1 else "✅ Normal",
+            "Hybrid": "🚨 Anomaly" if pred == 1 else "✅ Normal",
+            "Result": status
+        })
+
+    df_result = pd.DataFrame(table_rows).set_index("Run ID")
+    print("\n" + df_result.to_string())
+    print("\n" + format_classification_report(calculate_metrics(y_true, y_pred), model_name="CI/CD Benchmark Hybrid (Cascaded Synergy)"))
+
+
+# =============================================================================
 # 🏁 จุดเริ่มต้นโปรแกรม (Main Entry Point)
 # =============================================================================
 def main():
@@ -329,9 +458,9 @@ def main():
     )
     arg_parser.add_argument(
         "--dataset",
-        choices=["hdfs", "hdfs_ai", "gha"],
+        choices=["hdfs", "hdfs_ai", "gha", "cicd"],
         default="hdfs",
-        help="เลือกชุดข้อมูลที่จะรัน: 'hdfs' / 'hdfs_ai' (HDFS Hybrid Dual-Engine - ค่าเริ่มต้น), หรือ 'gha' (GitHub Actions CI/CD)"
+        help="เลือกชุดข้อมูลที่จะรัน: 'hdfs' / 'hdfs_ai' (HDFS Hybrid Dual-Engine - ค่าเริ่มต้น), 'cicd' (CI/CD Benchmark จำลองติดมากับ Git), หรือ 'gha' (GitHub Actions Runner จริง)"
     )
     arg_parser.add_argument(
         "--retrain",
@@ -342,6 +471,8 @@ def main():
 
     if args.dataset in ["hdfs", "hdfs_ai"]:
         run_hdfs_hybrid_pipeline(force_retrain=args.retrain)
+    elif args.dataset == "cicd":
+        run_cicd_synthetic_pipeline()
     else:
         run_gha_pipeline()
 
