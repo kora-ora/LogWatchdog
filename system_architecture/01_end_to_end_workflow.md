@@ -41,18 +41,21 @@ flowchart TD
     end
 
     %% 4. Modular Model Engine
-    subgraph Layer3["🧠 4. Core Detection Engine (เลือกใช้โมเดลตามความเหมาะสม)"]
+    subgraph Layer3["🧠 4. Core Detection Engine (สถาปัตยกรรมโมเดล)"]
         direction TB
-        subgraph ModelOptions["โมเดลที่เลือกใช้งานตามเป้าหมาย (Swappable Core)"]
-            M1["Isolation Forest\n(เน้นเร็ว / เหมาะกับ Count Anomaly)"]:::engineStyle
-            M2["DeepLog (LSTM)\n(เน้นลำดับเวลา / เหมาะกับ Sequential Anomaly)"]:::engineStyle
+        subgraph ModelOptions["โมเดลคู่ขนาน & สถาปัตยกรรมไฮบริด (Hybrid Dual-Engine)"]
+            M1["🌲 Isolation Forest\n(ด่านตรวจความถี่ / Volume Outlier)"]:::engineStyle
+            M2["🧠 DeepLog (LSTM)\n(ด่านตรวจลำดับเวลา / Sequential Predictor)"]:::engineStyle
+            M3["🛡️ HybridLogDetector\n(Cascaded Synergy Engine)"]:::engineStyle
+            M1 --> M3
+            M2 --> M3
         end
     end
 
     %% 5. Decision & Evaluation Layer
-    subgraph Layer4["⚖️ 5. Anomaly Decision & Scoring (ตัดสินผล)"]
-        ScoreCalc["Anomaly Scoring & Threshold\n(คำนวณคะแนนความผิดปกติเทียบค่าเกณฑ์)"]:::decisionStyle
-        DecisionCheck{"Score > Threshold\nหรือ Next-Event ผิดคิว?"}:::decisionStyle
+    subgraph Layer4["⚖️ 5. Cascaded Synergy Decision (ผสานพลังตัดสินผล)"]
+        ScoreCalc["Synergy Logic: LSTM Radar + iForest Filter\n(คง Recall 100% และลด False Alarm ลง 46.9%)"]:::decisionStyle
+        DecisionCheck{"LSTM ตรวจพบ?\nและผ่านเงื่อนไข Synergy?"}:::decisionStyle
     end
 
     %% 6. Outputs & Explainability
@@ -61,7 +64,7 @@ flowchart TD
         AnomalyAlert["🚨 Anomaly Detected\n(พบความผิดปกติ แจ้งเตือนทีม DevOps)"]:::outputAlert
         
         subgraph ExplainBox["🔍 Root Cause Localization"]
-            RootCause["วิเคราะห์หาสาเหตุของปัญหา (Root Cause)\n- ชี้เป้าบรรทัด Log ที่ผิดปกติ\n- ระบุ Error Template (Timeout, OOM, IAM Denied)"]:::explainStyle
+            RootCause["วิเคราะห์หาสาเหตุของปัญหา (Root Cause)\n- ชี้เป้าบรรทัด Log ต้นเหตุ [CULPRIT]\n- Context Window 5 บรรทัด & Softmax Probabilities"]:::explainStyle
         end
     end
 
@@ -76,15 +79,13 @@ flowchart TD
     CountVec --> M1
     SeqWindow --> M2
 
-    M1 --> ScoreCalc
-    M2 --> ScoreCalc
-
+    M3 --> ScoreCalc
     ScoreCalc --> DecisionCheck
     DecisionCheck -->|"ปกติ (No)"| NormalResult
     DecisionCheck -->|"ผิดปกติ (Yes)"| AnomalyAlert
 
     AnomalyAlert --> RootCause
-    M2 -.->|"ส่งค่า Loss / Mismatch Step"| RootCause
+    M2 -.->|"ส่งค่า Top-K Candidate Probabilities"| RootCause
 ```
 
 ---

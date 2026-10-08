@@ -39,4 +39,5 @@
   * `train-00000-of-00003.parquet` (44.18 MB): 153,350 Blocks (Normal: 148,833, Anomaly: 4,517)
   * `validation-00000-of-00001.parquet` (16.60 MB)
 * **วัตถุประสงค์:** ใช้ทำ **Zero-OOV Sequence Benchmark** เพื่อพิสูจน์ขีดความสามารถการทำนายและตรวจจับลำดับขั้นตอน (Sequential Order Violations) ของ DeepLog LSTM ล้วนๆ โดยตัดอิทธิพลของ Rule-based OOV ออก 100%
+* **การดาวน์โหลดอัตโนมัติ:** สามารถสั่งรัน `python scripts/download_data.py` เพื่อดาวน์โหลดไฟล์ Parquet จาก Hugging Face ตรงเข้าสู่โฟลเดอร์นี้ได้โดยอัตโนมัติ
 

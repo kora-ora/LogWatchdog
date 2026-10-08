@@ -33,6 +33,10 @@ flowchart TD
     subgraph Explainability & Root Cause
         T8["08. Root Cause Localization<br/>(Block 5 Explainer & Incident Report)"]
     end
+
+    subgraph Hybrid Dual-Engine
+        T9["09. Hybrid Dual-Engine & Synergy<br/>(ผสาน iForest + DeepLog ลด FP 46.9%)"]
+    end
     
     Hub --> T1
     Hub --> T2
@@ -42,6 +46,7 @@ flowchart TD
     Hub --> T6
     Hub --> T7
     Hub --> T8
+    Hub --> T9
 
     T1 -.-> T2
     T2 -.-> T3
@@ -50,6 +55,7 @@ flowchart TD
     T5 -.-> T6
     T6 -.-> T7
     T7 -.-> T8
+    T8 -.-> T9
 ```
 
 ---
@@ -130,6 +136,16 @@ flowchart TD
   - การระบุพิกัดบรรทัดเกิดเหตุ (`[CULPRIT]`) และการสกัด Context Window
   - การคำนวณและเปรียบเทียบสิ่งที่ AI คาดหวัง vs สิ่งที่เกิดขึ้นจริง (Expected Candidates % vs Reality)
   - โครงสร้างรายงานการชันสูตรเชิงลึก (**Incident Diagnostic Report**)
+
+---
+
+### 9. [09. สถาปัตยกรรม Hybrid Dual-Engine และกลยุทธ์ Cascaded Synergy](system_architecture/09_hybrid_dual_engine_synergy.md)
+- **ไฟล์:** `system_architecture/09_hybrid_dual_engine_synergy.md` (หรือ `[[09_hybrid_dual_engine_synergy]]`)
+- **เนื้อหาหลัก:**
+  - การผสานจุดแข็งของ **Isolation Forest (ด่านตรวจความถี่)** และ **DeepLog LSTM (ด่านตรวจลำดับเวลา)**
+  - กฎการตัดสินใจแบบ **Cascaded Synergy** ที่ใช้ DeepLog เป็นเรดาร์กวาดจับ และใช้ iForest เป็นตัวกรองเสียงรบกวน (Noise Suppressor)
+  - ผลลัพธ์เชิงประจักษ์: ลด False Alarm ลง 46.9% (จาก 539 เหลือ 286 บล็อก) ดัน F1-Score แตะ 84.72% และรักษา Recall 100.00% ไว้อย่างสมบูรณ์แบบ
+  - การเรียกใช้งานคลาส `HybridLogDetector` ในซอฟต์แวร์จริง
 
 ---
 

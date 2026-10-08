@@ -1,20 +1,23 @@
-# 🚀 AI-based Log Anomaly Detection (DeepLog LSTM Architecture)
+# 🐕 LogWatchdog: Hybrid Dual-Engine AI Log Anomaly Detection
 
-ระบบตรวจจับและวินิจฉัยความผิดปกติของ Log ในระบบกระจายศูนย์ (Distributed Systems เช่น HDFS) และ CI/CD Pipeline (GitHub Actions) โดยใช้สถาปัตยกรรม Deep Learning **DeepLog (2-Layer LSTM Next-Event Predictor)** ร่วมกับการทำ Structuring ข้อความดิบด้วย **Drain3 Template Miner** และระบบวิเคราะห์ต้นตอของปัญหา (**DeepLog Incident Explainer**)
+ระบบตรวจจับและวินิจฉัยความผิดปกติของ Log ในระบบกระจายศูนย์ (Distributed Systems เช่น HDFS) และ CI/CD Pipeline (GitHub Actions) โดยใช้สถาปัตยกรรม **Hybrid Dual-Engine** ที่ผสานพลังของ **Isolation Forest (ด่านตรวจความถี่ / Volume & Count Outliers)** ร่วมกับ **DeepLog 2-Layer LSTM (ด่านตรวจลำดับเวลาและขั้นตอน / Sequential Transitions)** ผ่านกลไก **Cascaded Synergy** พร้อมระบบสกัดโครงสร้างข้อความ **Drain3 Template Miner** และระบบชันสูตรชี้เป้าต้นตอของปัญหา (**Incident Diagnostic Explainer**)
 
 ---
 
 ## 🌟 จุดเด่นและคุณค่าของระบบ (Key Highlights)
 
-1. **🧠 AI/Deep Learning Model-Centric:** ตรวจจับความผิดปกติที่เกิดจากการ **สลับลำดับขั้นตอน (Sequential Order Violation)** และ **การกระโดดข้ามสเต็ป (Step Skipping)** ซึ่งอัลกอริทึม Rule-based หรือ Count Vector ทั่วไปไม่สามารถตรวจจับได้
-2. **🔬 Zero-OOV Benchmark Proven (พิสูจน์คุณค่าโมเดลจริง):** ในการทดสอบบนชุดข้อมูลที่กรองคำแปลกปลอม (Out-Of-Vocabulary) ออกทั้งหมด 100%:
-   - **Rule-based OOV Detection:** ทำได้ Recall = **0.00%** (จับความผิดปกติไม่ได้แม้แต่เคสเดียว)
-   - **DeepLog LSTM Model:** ตรวจจับความผิดปกติของลำดับได้ Recall = **100.00%** (FN = 0)
-3. **🛡️ Option A Zero-Missed Critical Strategy:** ปรับจูนโมเดลเพื่อความปลอดภัยสูงสุดของระบบ Production (SRE Philosophy):
-   - Recall = **100.00%** (FN = 0 ไม่ปล่อยให้เหตุการณ์ระบบพังหลุดรอดไปได้)
-   - Precision = **58.70%**, F1-Score = **73.97%**, Accuracy = **80.02%**
+1. **🛡️ สถาปัตยกรรมผสานพลัง (Cascaded Synergy Dual-Engine):**
+   - **DeepLog LSTM:** รับหน้าที่เป็น "เรดาร์กวาดจับความปลอดภัย" ตรวจจับลำดับขั้นตอนผิดปกติ รักษา **Recall = 100.00% (FN = 0)**
+   - **Isolation Forest:** รับหน้าที่เป็น "ด่านกรองเสียงรบกวน (Density Validator)" คัดกรองการแจ้งเตือนที่เกิดจากความผันผวนปกติ ช่วยลด False Positive ลงได้ถึง **46.9%** (ลดจาก 539 เหลือ 286 บล็อก)
+   - ส่งผลให้ค่า **F1-Score พุ่งแตะ 84.72%** (เพิ่มขึ้นอย่างมีนัยสำคัญ +10.08% เหนือกว่าโมเดลเดี่ยว)
+2. **🧠 Pure Sequential Intelligence (แก้โจทย์ที่ Rule-based ทำไม่ได้):**
+   - ตรวจจับความผิดปกติที่เกิดจากการ **สลับลำดับขั้นตอน (Sequential Order Violation)** และ **การข้ามสเต็ป (Step Skipping)**
+   - ในการทดสอบแบบ Zero-OOV Benchmark (ตัดคำแปลกปลอมออก 100%): ระบบ **Rule-based OOV ทำได้ Recall = 0.00%** (หลุดรอดหมด) ขณะที่ระบบ AI ของเราทำได้ **Recall = 100.00%**
+3. **🔍 Root Cause Localization (Block 5 Explainer):**
+   - ชี้เป้าพิกัดบรรทัด Log ที่เป็นต้นเหตุทันที (`[CULPRIT]`) พร้อมดึง Context Window 5 บรรทัดแวดล้อม
+   - แจกแจงการตัดสินใจด้วย Softmax Probability Distribution (เปรียบเทียบสิ่งที่ AI คาดหวัง vs สิ่งที่เกิดขึ้นจริง)
 4. **🧱 Lego Modular Architecture:** ออกแบบระบบแยกอิสระ 5 บล็อกตามมาตรฐาน Standard Interfaces สามารถสลับเปลี่ยนโมเดลและตัวแยกวิเคราะห์ได้อย่างอิสระ
-5. **🔍 DeepLog Explainer & Root Cause Localization:** ชี้เป้าบรรทัด Log ที่เป็นต้นตอ (`[CULPRIT]`), แสดงบริบทก่อน-หลัง 5 บรรทัด และแจกแจงความน่าจะเป็นของเหตุการณ์ที่ AI คาดการณ์ (Softmax Probability Distribution)
+5. **⚡ Zero-Friction Out-of-the-Box Execution:** แนบ Pretrained Checkpoints ขนาดกะทัดรัด (< 500 KB) ทำให้ผู้ที่ Clone โครงงานไปสามารถรัน Web Dashboard และ Pipeline ได้ทันทีใน 1 วินาที
 
 ---
 
@@ -23,47 +26,57 @@
 ```mermaid
 flowchart LR
     subgraph Brick1["🧱 1. Ingestion"]
-        L1["HDFS Parquet / Real GHA Logs"]
+        L1["HDFS Logs / CI/CD Logs"]
     end
 
     subgraph Brick2["🧱 2. Parser"]
-        P1["Drain3 Template Miner"]
+        P1["Drain3 Template Miner<br/>(Inductive Zero-Leakage)"]
     end
 
-    subgraph Brick3["🧱 3. Feature"]
-        F1["Sliding Window Tokenizer<br/>(w = 3)"]
+    subgraph Brick3["🧱 3. Features"]
+        F1["Count Vector Builder<br/>(Template Frequency)"]
+        F2["Sequence Extractor<br/>(Sliding Window w=3)"]
     end
 
-    subgraph Brick4["🧠 4. DeepLog AI"]
-        M1["2-Layer LSTM Network<br/>(Hidden=32, Top-K=3)"]
+    subgraph Brick4["🧠 4. Hybrid Dual-Engine"]
+        M1["🌲 Isolation Forest<br/>(Volume Outliers)"]
+        M2["🧠 DeepLog LSTM<br/>(Sequential Order)"]
+        H1["🛡️ Cascaded Synergy<br/>(Noise Suppressor)"]
+        M1 --> H1
+        M2 --> H1
     end
 
-    subgraph Brick5["🔍 5. Explainer & UI"]
-        E1["DeepLog Incident Explainer<br/>+ Streamlit Dashboard"]
+    subgraph Brick5["🔍 5. Forensics & UI"]
+        E1["DeepLog Explainer<br/>(Root Cause Locator)"]
+        UI1["Streamlit Dashboard<br/>(Incident Forensics)"]
     end
 
-    Brick1 --> Brick2 --> Brick3 --> Brick4 --> Brick5
+    Brick1 --> Brick2
+    Brick2 --> F1 --> M1
+    Brick2 --> F2 --> M2
+    H1 --> Brick5
 ```
 
 ---
 
-## 📊 ผลการทดสอบโมเดล (Benchmark & Confusion Matrix)
+## 📊 ผลการทดสอบเปรียบเทียบโมเดล (Comparative Benchmark Evaluation)
 
-### ผลลัพธ์บน Zero-OOV HDFS Dataset (5,000 Train / 2,793 Test Sequences):
+การประเมินผลบนชุดทดสอบมาตรฐาน **HDFS Zero-OOV Test Benchmark จำนวน 2,793 Sessions** (Normal 2,000 + Anomaly 793 Sessions):
 
-| มาตรวัด (Metric)                  | ผลลัพธ์ DeepLog LSTM (Option A) |  ผลลัพธ์ Rule-based OOV  |
-| :-------------------------------- | :-----------------------------: | :----------------------: |
-| **Recall (ความไวต่อสิ่งผิดปกติ)** |     **100.00% (793 / 793)**     |   **0.00% (0 / 793)**    |
-| **False Negatives (FN)**          |       **0 (Zero Missed)**       | **793 (หลุดรอดทั้งหมด)** |
-| **Precision**                     |           **58.70%**            |        **0.00%**         |
-| **F1-Score**                      |           **73.97%**            |        **0.00%**         |
-| **Accuracy**                      |           **80.02%**            |        **71.61%**        |
+| มาตรวัดประสิทธิภาพ (Metric) | 🌲 Isolation Forest (Baseline) | 🧠 DeepLog LSTM (Option A) | 🛡️ LogWatchdog Hybrid (Cascaded Synergy) | การเปลี่ยนแปลง (vs LSTM) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Recall (ความไวต่อสิ่งผิดปกติ)** | 28.25% (224 / 793) | **100.00% (793 / 793)** | **100.00% (793 / 793)** | **คงที่ 100% (Zero Miss)** |
+| **False Negatives (FN หลุดรอด)** | 569 Sessions | **0 Sessions** | **0 Sessions** | **0 (ไม่ปล่อยเคสหลุด)** |
+| **False Positives (FP เตือนลวง)** | 178 Sessions | 539 Sessions | **286 Sessions** | **ลดลง 46.9% (-253 บล็อก)** |
+| **Precision (ความแม่นยำเตือน)** | 55.72% | 59.53% | **73.49%** | **+13.96%** |
+| **F1-Score (คะแนนเฉลี่ยฮาร์โมนิก)** | 37.49% | 74.64% | **84.72%** | **+10.08%** (สูงสุด) |
+| **Accuracy (ความถูกต้องโดยรวม)** | 73.25% | 80.70% | **89.76%** | **+9.06%** |
 
-#### ตาราง Confusion Matrix (DeepLog LSTM):
+#### ตาราง Confusion Matrix (LogWatchdog Hybrid Dual-Engine):
 ```
-                 Actual Normal    Actual Anomaly
-Predicted Normal      1,442 (TN)            0 (FN)
-Predicted Anomaly       558 (FP)          793 (TP)
+                       Actual Normal (0)      Actual Anomaly (1)
+Predicted Normal (0)       1,714 (TN)                 0 (FN)       -> Zero Missed!
+Predicted Anomaly (1)        286 (FP)               793 (TP)       -> ลด FP ลง 46.9%
 ```
 
 ---
